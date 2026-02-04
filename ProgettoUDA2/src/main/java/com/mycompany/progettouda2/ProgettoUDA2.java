@@ -3,12 +3,15 @@
  */
 package com.mycompany.progettouda2;
 
+import interfaccia.FrameBiblioteca;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import materiale.Libro;
+import materiale.ListaMateriale;
 import materiale.MaterialeBiblioteca;
 import materiale.MaterialeBiblioteca.genereMateriale;
-
 /**
  *
  * @author lucrezia.pasulo
@@ -26,11 +29,14 @@ public class ProgettoUDA2 {
         libro1.genere = genereMateriale.FANTASY;
 
 //        System.out.println(libro1.toString());
-        List<MaterialeBiblioteca> listaMateriale = new ArrayList<>();
-        listaMateriale.add(libro1);
+//        List<MaterialeBiblioteca> listaMateriale = new ArrayList<>();
+//        listaMateriale.add(libro1);
         // For each -> stampa
-//            System.out.println(n.toString());
-        }
+        //            System.out.println(n.toString());
+        java.awt.EventQueue.invokeLater(() -> {
+            new FrameBiblioteca().setVisible(true);
+        });
+
     }
 
 }
