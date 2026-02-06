@@ -13,6 +13,7 @@ public class Libro extends MaterialeBiblioteca {
     public String tipo = "Libro";
 
     public String titolo;
+    public String autore;
     public genereMateriale genere;
     public int anno;
 
@@ -20,9 +21,10 @@ public class Libro extends MaterialeBiblioteca {
 // Costruttore vuoto
     }
 
-    public Libro(String titolo, genereMateriale genere, int anno) {
+    public Libro(String titolo, genereMateriale genere, String autore, int anno) {
         this.titolo = titolo;
         this.genere = genere;
+        this.autore = autore;
         this.anno = anno;
     }
 
@@ -39,5 +41,4 @@ public class Libro extends MaterialeBiblioteca {
         return false;
     }
 
-    
 }

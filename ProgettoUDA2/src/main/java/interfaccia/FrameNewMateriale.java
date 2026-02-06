@@ -7,6 +7,7 @@ package interfaccia;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import materiale.Libro;
 import materiale.MaterialeBiblioteca;
 import materiale.MaterialeBiblioteca.genereMateriale;
 
@@ -39,6 +40,38 @@ public class FrameNewMateriale extends javax.swing.JFrame {
                 String titolo = jTxtFieldTitolo.getText();
                 String autore = jTxtFieldAutore.getText();
                 int anno = Integer.parseInt(jTxtFieldAnno.getText());
+                String genere = jListGenere.getSelectedValue();
+                String tipo = jListTipo.getSelectedValue();
+                
+                ArrayList listaDaControllare = new ArrayList<>();
+                listaDaControllare.add(titolo);
+                listaDaControllare.add(autore);
+                listaDaControllare.add(anno);
+                listaDaControllare.add(genere);
+                listaDaControllare.add(tipo);
+                
+                
+                
+                
+
+                // Salvo il nuovo materiale
+                if (tipo.equals("Libro")) {
+                    Libro libroToSave = new Libro();
+
+                    libroToSave.anno = anno;
+                    libroToSave.titolo = titolo;
+                    libroToSave.autore = autore;
+                    libroToSave.genere = genereMateriale.valueOf(genere);                    
+                    
+                } else if (tipo.equals("Rivista")) {
+                    //TODO: implemento Rivista
+                } else if (tipo.equals("Audiovisivo")) {
+                    //TODO: implemento Audiovisivo
+                } else{
+                    // Errore
+                }
+                
+                
 
                 new FrameNewMateriale().setVisible(false);
                 new FrameInventario().setVisible(true);
@@ -66,6 +99,9 @@ public class FrameNewMateriale extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jListGenere = new javax.swing.JList<>();
         jButtonSalva = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jListTipo = new javax.swing.JList<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -119,6 +155,19 @@ public class FrameNewMateriale extends javax.swing.JFrame {
             }
         });
 
+        jLabel6.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        jLabel6.setText("Tipologia");
+
+        jScrollPane2.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+
+        jListTipo.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        jListTipo.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Libro", "Rivista", "Audiovisivo" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane2.setViewportView(jListTipo);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -129,22 +178,24 @@ public class FrameNewMateriale extends javax.swing.JFrame {
                         .addGap(126, 126, 126)
                         .addComponent(jLabel3))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(149, 149, 149)
-                        .addComponent(jButtonSalva, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
                         .addGap(36, 36, 36)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel2)
                             .addComponent(jLabel1)
-                            .addComponent(jLabel5)
-                            .addComponent(jLabel4))
-                        .addGap(18, 18, 18)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel6)
+                            .addComponent(jLabel5))
+                        .addGap(24, 24, 24)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTxtFieldAnno, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTxtFieldAnno, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jTxtFieldAutore, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jTxtFieldTitolo, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(83, Short.MAX_VALUE))
+                            .addComponent(jTxtFieldTitolo, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(162, 162, 162)
+                        .addComponent(jButtonSalva, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(101, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -163,13 +214,17 @@ public class FrameNewMateriale extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(jTxtFieldAnno, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel5)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel6)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5))
                 .addGap(28, 28, 28)
                 .addComponent(jButtonSalva, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(24, Short.MAX_VALUE))
+                .addGap(62, 62, 62))
         );
 
         pack();
@@ -229,8 +284,11 @@ public class FrameNewMateriale extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JList<String> jListGenere;
+    private javax.swing.JList<String> jListTipo;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextField jTxtFieldAnno;
     private javax.swing.JTextField jTxtFieldAutore;
     private javax.swing.JTextField jTxtFieldTitolo;
