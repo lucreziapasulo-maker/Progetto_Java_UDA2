@@ -25,7 +25,6 @@ public abstract class MaterialeBiblioteca<T> {
     public genereMateriale genere;
     int anno;
 
-    public abstract boolean isDisponibile();
 
     public String getTipo(MaterialeBiblioteca biblioteca) {
         return biblioteca.tipo;
@@ -39,9 +38,6 @@ public abstract class MaterialeBiblioteca<T> {
         return biblioteca.titolo;
     }
 
-    public abstract void presta();
-
-    public abstract void restituisci();
 
     @Override
     public String toString() {
