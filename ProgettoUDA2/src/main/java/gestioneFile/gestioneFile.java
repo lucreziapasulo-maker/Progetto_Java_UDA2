@@ -4,31 +4,193 @@
  */
 package gestioneFile;
 
+import interfaccia.PopupFrame;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import materiale.AudioVisivo;
+import materiale.Libro;
+import materiale.MaterialeBiblioteca;
+import materiale.Rivista;
 
 /**
  *
  * @author lucrezia.pasulo
  */
-public class gestioneFile {
+public class GestioneFile {
 
+    /*
+    Vengono create tante cartelle quanti sono i tipi di MaterialeBiblioteca 
+    (presi da enum tipoMateriale).
+     */
     public static final String FOLDER_MAIN = System.getProperty("user.dir");
-    public static final String FOLDER_LIBRI = "Libri";
-//    public final String FOLDER_RIVISTE = "Riviste";
+    public static final String FOLDER_LIBRI = MaterialeBiblioteca.tipoMateriale.LIBRO.toString();
+    public static final String FOLDER_RIVISTE = MaterialeBiblioteca.tipoMateriale.RIVISTA.toString();
+    public static final String FOLDER_AUDIOVISIVO = MaterialeBiblioteca.tipoMateriale.AUDIOVISIVO.toString();
+    private static final String ESTENSIONE = ".txt";
 
+    /*
+    -- Metodo per prima creazione cartelle di default
+     */
     public static void initApp() {
 
-        // Creo le cartelle principali
-        File nuovaCartella = new File(FOLDER_MAIN, FOLDER_LIBRI);
+        // Creazione delle cartelle principali
+        ArrayList listaFolder = new ArrayList();
+        listaFolder.add(FOLDER_LIBRI);
+        listaFolder.add(FOLDER_RIVISTE);
+        listaFolder.add(FOLDER_AUDIOVISIVO);
 
-        if (nuovaCartella.mkdir()) {
-            System.out.println("Creazione cartella: " + nuovaCartella.toString());
-        } else {
-            // Non faccio nulla
+        for (Object each : listaFolder) {
+            String folderAttuale = each.toString();
+            File nuovaCartella = new File(FOLDER_MAIN, folderAttuale);
+
+            if (nuovaCartella.mkdir()) {
+                System.out.println("Creazione cartella: " + nuovaCartella.toString());
+            } else {
+                // Non faccio nulla
+            }
         }
     }
-}
 
+    //------
+    // TODO: non funziona!! Quando richiamo materiale.[cose] 
+    public static void creaLibroTEST(String titolo, Libro materiale) {
+        String fileName = titolo + ESTENSIONE;
+        File fileTOwrite = new File(FOLDER_LIBRI, fileName);
+
+        System.out.println("Creazione file: " + fileTOwrite.getName());
+
+        String testo;
+
+//      Creazione file
+        if (!fileTOwrite.exists()) {
+            try {
+                fileTOwrite.createNewFile();
+                // Scrivo il file
+                PrintWriter writer = new PrintWriter(fileTOwrite);
+
+                // Scrivo il contenuto nel file
+                writer.write(materiale.contenutoTOwrite());
+
+                // Pulisco il writer e lo chiudo
+                writer.flush();
+                writer.close();
+
+            } catch (Exception e) {
+                testo = "Errore nella creazione del file " + fileTOwrite.getName();
+                System.out.println(testo);
+                PopupFrame.alertPopup(testo);
+            }
+        } else {
+            // Chiedo se sovrascrivere il file
+            testo = "Esiste già un file di questo libro, si intende sovrascriverlo?";
+            int ok = PopupFrame.confirmPopup(testo);
+
+            if (ok == 1) {
+                try {
+                    fileTOwrite.createNewFile();
+                } catch (Exception e) {
+                    testo = "Errore nella creazione del file " + fileTOwrite.getName();
+                    System.out.println(testo);
+                }
+            } else {
+                // Non faccio nulla
+            }
+        }
+    }
+
+    /*
+    -- 
+     */
+    public static void creaLibro(String titolo, Libro materiale) {
+        String fileName = titolo + ESTENSIONE;
+        File fileTOwrite = new File(FOLDER_LIBRI, fileName);
+
+        creaFile(fileTOwrite, materiale);
+    }
+
+    public static void creaRivista(String titolo, Rivista materiale) {
+        String fileName = titolo + ESTENSIONE;
+        File fileTOwrite = new File(FOLDER_RIVISTE, fileName);
+
+        creaFile(fileTOwrite, materiale);
+    }
+
+    public static void creaAudioVisivo(String titolo, AudioVisivo materiale) {
+        String fileName = titolo + ESTENSIONE;
+        File fileTOwrite = new File(FOLDER_AUDIOVISIVO, fileName);
+
+        creaFile(fileTOwrite, materiale);
+    }
+
+
+    /*
+    -- Metodo per creare il file
+     */
+    private static void creaFile(File fileTOwrite, MaterialeBiblioteca materiale) {
+        System.out.println("Creazione file: " + fileTOwrite.getName());
+
+        String testo;
+
+//      Creazione file
+        if (!fileTOwrite.exists()) {
+            try {
+                fileTOwrite.createNewFile();
+                // Scrivo il file
+                materiale.contenutoTOwrite();
+                boolean esito = scriviFile(fileTOwrite, materiale);
+                if (esito) {
+                    PopupFrame.alertPopup("File " + fileTOwrite.getName() + " creato correttamente");
+                } else {
+                    PopupFrame.alertPopup("Problemi nella scrittura del file " + fileTOwrite.getName());
+                }
+            } catch (Exception e) {
+                testo = "Errore nella creazione del file " + fileTOwrite.getName();
+                System.out.println(testo);
+                PopupFrame.alertPopup(testo);
+            }
+        } else {
+            // Chiedo se sovrascrivere il file
+            testo = "Esiste già un file di questo libro, si intende sovrascriverlo?";
+            int ok = PopupFrame.confirmPopup(testo);
+
+            if (ok == 1) {
+                try {
+                    fileTOwrite.createNewFile();
+                } catch (Exception e) {
+                    testo = "Errore nella creazione del file " + fileTOwrite.getName();
+                    System.out.println(testo);
+                }
+            } else {
+                // Non faccio nulla
+            }
+        }
+    }
+
+    /*
+    -- Metodo per scrivere il contenuto nel file
+     */
+    public static boolean scriviFile(File fileTOwrite, MaterialeBiblioteca materiale) {
+        try {
+            PrintWriter writer = new PrintWriter(fileTOwrite);
+
+            // Scrivo il contenuto nel file
+            writer.write(materiale.contenutoTOwrite());
+
+            // Pulisco il writer e lo chiudo
+            writer.flush();
+            writer.close();
+
+            return true;
+
+        } catch (Exception e) {
+
+        }
+        return false;
+    }
+
+}
 
 //////
 //////

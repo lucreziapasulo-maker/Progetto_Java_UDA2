@@ -10,43 +10,42 @@ package materiale;
  */
 public abstract class MaterialeBiblioteca<T> {
 
+    public enum tipoMateriale {
+        LIBRO,
+        RIVISTA,
+        AUDIOVISIVO
+    }
+
     public enum genereMateriale {
-        THRILLER,
-        FANTASY,
-        STORICO,
-        AVVENTURA,
-        AZIONE,
-        SAGGIO,
-        ROMANTICO
+
     }
 
     String titolo;
-    String tipo;
+    String autore;
+    public tipoMateriale tipo;
     public genereMateriale genere;
     int anno;
 
-
     public String getTipo(MaterialeBiblioteca biblioteca) {
-        return biblioteca.tipo;
+        return biblioteca.tipo.toString();
     }
 
-    public genereMateriale getGenere(MaterialeBiblioteca biblioteca) {
-        return biblioteca.genere;
+    public String getGenere(MaterialeBiblioteca biblioteca) {
+        return biblioteca.genere.toString();
+    }
+
+    public String getAnno(MaterialeBiblioteca biblioteca) {
+        return String.valueOf(biblioteca.anno);
+    }
+
+    public String getAutore(MaterialeBiblioteca biblioteca) {
+        return biblioteca.autore;
     }
 
     public String getTitolo(MaterialeBiblioteca biblioteca) {
         return biblioteca.titolo;
     }
 
-
-    @Override
-    public String toString() {
-        String stringa = "\nTitolo: " + this.titolo
-                + "\nGenere: " + this.genere
-                + "\nAnno: " + this.anno
-                + "\nTipologia: " + this.tipo + "\n";
-
-        return stringa;
-    }
+    public abstract String contenutoTOwrite();
 
 }

@@ -1,7 +1,6 @@
 package interfaccia;
 
-
-import gestioneFile.gestioneFile;
+import gestioneFile.GestioneFile;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -21,32 +20,23 @@ public class FrameBiblioteca extends javax.swing.JFrame {
     public FrameBiblioteca() {
         initComponents();
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        
+
         // Inizializzo le cartelle
-        gestioneFile.initApp();
+        GestioneFile.initApp();
 
-        
-        jButtonCerca.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String titoloDaCercare = jTxtCerca.getText();
-                BCercaTitolo.cercaTitolo(titoloDaCercare);
-            }
+        // Azioni bottoni interfaccia
+        jButtonCerca.addActionListener((ActionEvent e) -> {
+            String titoloDaCercare = jTxtCerca.getText();
+            BCercaTitolo.cercaTitolo(titoloDaCercare);
         });
 
-        jButtonInventario.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new FrameBiblioteca().setVisible(false);
-                new FrameInventario().setVisible(true);
-            }
+        jButtonInventario.addActionListener((ActionEvent e) -> {
+            this.setVisible(false);
+            new FrameInventario(this).setVisible(true);
         });
-        
-        jButtonPrestito.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // TODO: Aggiungere richiamo metodo
-            }
+
+        jButtonPrestito.addActionListener((ActionEvent e) -> {
+            // TODO: Aggiungere richiamo metodo
         });
 
     }
@@ -64,9 +54,7 @@ public class FrameBiblioteca extends javax.swing.JFrame {
         jButtonPrestito = new javax.swing.JButton();
         jButtonRestituisci = new javax.swing.JButton();
         jButtonInventario = new javax.swing.JButton();
-        jButtonRegistrati = new javax.swing.JButton();
         jButtonCerca = new javax.swing.JButton();
-        jButtonAccedi = new javax.swing.JButton();
         jTxtCerca = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -98,27 +86,11 @@ public class FrameBiblioteca extends javax.swing.JFrame {
             }
         });
 
-        jButtonRegistrati.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jButtonRegistrati.setText("Registrati");
-        jButtonRegistrati.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonRegistratiActionPerformed(evt);
-            }
-        });
-
         jButtonCerca.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jButtonCerca.setText("Cerca libro");
         jButtonCerca.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonCercaActionPerformed(evt);
-            }
-        });
-
-        jButtonAccedi.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jButtonAccedi.setText("Accedi");
-        jButtonAccedi.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonAccediActionPerformed(evt);
             }
         });
 
@@ -138,9 +110,7 @@ public class FrameBiblioteca extends javax.swing.JFrame {
                 .addGap(29, 29, 29)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jButtonPrestito, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButtonRestituisci, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButtonRegistrati, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButtonAccedi, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jButtonRestituisci, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -165,12 +135,8 @@ public class FrameBiblioteca extends javax.swing.JFrame {
                         .addComponent(jTxtCerca, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)
                         .addGap(18, 18, 18)))
                 .addGap(35, 35, 35)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButtonRegistrati, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButtonInventario, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(6, 6, 6)
-                .addComponent(jButtonAccedi, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(39, Short.MAX_VALUE))
+                .addComponent(jButtonInventario, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(85, Short.MAX_VALUE))
         );
 
         pack();
@@ -188,17 +154,9 @@ public class FrameBiblioteca extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jButtonInventarioActionPerformed
 
-    private void jButtonRegistratiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRegistratiActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButtonRegistratiActionPerformed
-
     private void jButtonCercaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCercaActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButtonCercaActionPerformed
-
-    private void jButtonAccediActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAccediActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButtonAccediActionPerformed
 
     /**
      * @param args the command line arguments
@@ -236,11 +194,9 @@ public class FrameBiblioteca extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButtonAccedi;
     private javax.swing.JButton jButtonCerca;
     private javax.swing.JButton jButtonInventario;
     private javax.swing.JButton jButtonPrestito;
-    private javax.swing.JButton jButtonRegistrati;
     private javax.swing.JButton jButtonRestituisci;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JTextField jTxtCerca;

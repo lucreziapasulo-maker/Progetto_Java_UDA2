@@ -6,58 +6,47 @@ package materiale;
 
 /**
  *
- * @author lucrezia.pasulo
+ * @author lu242
  */
-public class Libro extends MaterialeBiblioteca {
+public class Rivista extends MaterialeBiblioteca {
 
     public enum genereMateriale {
-        THRILLER,
-        FANTASY,
-        STORICO,
-        AVVENTURA,
-        AZIONE,
-        SAGGIO,
-        ROMANTICO
+        GOSSIP,
+        SCIENZA,
+        CUCINA,
+        GIARDINAGGIO,
+        SPORT,
+        FAI_DA_TE
     }
 
-//    public tipoMateriale tipo = MaterialeBiblioteca.tipoMateriale.LIBRO;
+    public tipoMateriale tipo = MaterialeBiblioteca.tipoMateriale.LIBRO;
+
     public String titolo;
     public String autore;
     public genereMateriale genere;
     public int anno;
-    public tipoMateriale tipo = tipoMateriale.LIBRO;
 
-    public Libro() {
+    public Rivista() {
 // Costruttore vuoto
     }
 
-    public Libro(String titolo, genereMateriale genere, String autore, int anno) {
+    public Rivista(String titolo, genereMateriale genere, String autore, int anno) {
         this.titolo = titolo;
         this.genere = genere;
         this.autore = autore;
         this.anno = anno;
     }
 
-    public String getTipo(Libro biblioteca) {
-        return biblioteca.tipo.toString();
-    }
-
-    public String getGenere(Libro biblioteca) {
-        return biblioteca.genere.toString();
-    }
-
-    public String getAnno(Libro biblioteca) {
-        return String.valueOf(biblioteca.anno);
-    }
-
-    public String getAutore(Libro biblioteca) {
-        return biblioteca.autore;
-    }
-
-    public String getTitolo(Libro biblioteca) {
-        return biblioteca.titolo;
-    }
-
+//    @Override
+//    public String contenutoTOwrite() {
+//        String titolo = this.getTitolo(this);
+//        String autore = this.getAutore(this);
+//        String anno = this.getAnno(this);
+//        String tipo = this.getTipo(this);
+//        String genere = this.getGenere(this);
+//
+//        return titolo + "\n" + autore + "\n" + anno + "\n" + tipo + "\n" + genere;
+//    }
     @Override
     public String contenutoTOwrite() {
         String titolo = this.titolo;

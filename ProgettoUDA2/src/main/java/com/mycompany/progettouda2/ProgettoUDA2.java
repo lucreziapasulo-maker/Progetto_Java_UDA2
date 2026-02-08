@@ -12,6 +12,7 @@ import materiale.Libro;
 import materiale.ListaMateriale;
 import materiale.MaterialeBiblioteca;
 import materiale.MaterialeBiblioteca.genereMateriale;
+
 /**
  *
  * @author lucrezia.pasulo
@@ -26,7 +27,7 @@ public class ProgettoUDA2 {
         Libro libro1 = new Libro();
         libro1.titolo = "LOTR";
         libro1.anno = 1920;
-        libro1.genere = genereMateriale.FANTASY;
+//        libro1.genere = genereMateriale.FANTASY;
 
 //        System.out.println(libro1.toString());
 //        List<MaterialeBiblioteca> listaMateriale = new ArrayList<>();

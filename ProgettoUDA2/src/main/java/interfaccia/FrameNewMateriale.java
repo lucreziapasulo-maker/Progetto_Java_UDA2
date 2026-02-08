@@ -4,12 +4,18 @@
  */
 package interfaccia;
 
+import gestioneFile.GestioneFile;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import javax.swing.JFrame;
+import materiale.AudioVisivo;
 import materiale.Libro;
 import materiale.MaterialeBiblioteca;
-import materiale.MaterialeBiblioteca.genereMateriale;
+import materiale.MaterialeBiblioteca.tipoMateriale;
+import materiale.Rivista;
 
 /**
  *
@@ -20,63 +26,68 @@ public class FrameNewMateriale extends javax.swing.JFrame {
     /**
      * Creates new form FrameNewMateriale
      */
-    public FrameNewMateriale() {
+    JFrame frameInventario;
+
+    public FrameNewMateriale(JFrame frameInventario) {
         initComponents();
+        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        // Popolo su interfaccia la lista "generi"
-        genereMateriale[] tmp = genereMateriale.values();
-        String[] stringaTmp = new String[tmp.length];
+        this.frameInventario = frameInventario;
 
-        for (int i = 0; i < tmp.length; i++) {
-            stringaTmp[i] = tmp.toString();
+        // ------------
+        // Popolo su interfaccia la lista "tipo"
+        tipoMateriale[] tmp2 = tipoMateriale.values();
+        String[] stringaTmp2 = new String[tmp2.length];
+
+        for (int i = 0; i < tmp2.length; i++) {
+            stringaTmp2[i] = tmp2[i].toString();
         }
-        jListGenere.setListData(stringaTmp);
+        jListTipo.setListData(stringaTmp2);
+        // ------------
+        // Popolo su interfaccia la lista "generi"
 
-        // Button Actions
-        jButtonSalva.addActionListener(new ActionListener() {
+        jListTipo.addMouseListener(new MouseAdapter() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void mouseClicked(MouseEvent evt) {
+                if (evt.getClickCount() == 1) {
 
-                String titolo = jTxtFieldTitolo.getText();
-                String autore = jTxtFieldAutore.getText();
-                int anno = Integer.parseInt(jTxtFieldAnno.getText());
-                String genere = jListGenere.getSelectedValue();
-                String tipo = jListTipo.getSelectedValue();
-                
-                ArrayList listaDaControllare = new ArrayList<>();
-                listaDaControllare.add(titolo);
-                listaDaControllare.add(autore);
-                listaDaControllare.add(anno);
-                listaDaControllare.add(genere);
-                listaDaControllare.add(tipo);
-                
-                
-                
-                
+                    String tipoMateriale = jListTipo.getSelectedValue();
 
-                // Salvo il nuovo materiale
-                if (tipo.equals("Libro")) {
-                    Libro libroToSave = new Libro();
+                    switch (tipoMateriale) {
+                        case "LIBRO":
+                            Libro.genereMateriale[] genereLibro = Libro.genereMateriale.values();
+                            String[] stringaTmp = new String[genereLibro.length];
 
-                    libroToSave.anno = anno;
-                    libroToSave.titolo = titolo;
-                    libroToSave.autore = autore;
-                    libroToSave.genere = genereMateriale.valueOf(genere);                    
-                    
-                } else if (tipo.equals("Rivista")) {
-                    //TODO: implemento Rivista
-                } else if (tipo.equals("Audiovisivo")) {
-                    //TODO: implemento Audiovisivo
-                } else{
-                    // Errore
+                            for (int i = 0; i < genereLibro.length; i++) {
+                                stringaTmp[i] = genereLibro[i].toString();
+                            }
+                            jListGenere.setListData(stringaTmp);
+                            break;
+
+                        case "RIVISTA":
+                            Rivista.genereMateriale[] genereRivista = Rivista.genereMateriale.values();
+                            String[] stringaTmpRivista = new String[genereRivista.length];
+
+                            for (int i = 0; i < genereRivista.length; i++) {
+                                stringaTmpRivista[i] = genereRivista[i].toString();
+                            }
+                            jListGenere.setListData(stringaTmpRivista);
+                            break;
+                        case "AUDIOVISIVO":
+                            AudioVisivo.genereMateriale[] genereAudioVisivo = AudioVisivo.genereMateriale.values();
+                            String[] stringaTmpAudioVisivo = new String[genereAudioVisivo.length];
+
+                            for (int i = 0; i < genereAudioVisivo.length; i++) {
+                                stringaTmpAudioVisivo[i] = genereAudioVisivo[i].toString();
+                            }
+                            jListGenere.setListData(stringaTmpAudioVisivo);
+                            break;
+                    }
+
                 }
-                
-                
-
-                new FrameNewMateriale().setVisible(false);
-                new FrameInventario().setVisible(true);
             }
         });
+
     }
 
     /**
@@ -121,12 +132,8 @@ public class FrameNewMateriale extends javax.swing.JFrame {
         jLabel5.setText("Genere");
 
         jTxtFieldTitolo.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jTxtFieldTitolo.setForeground(new java.awt.Color(153, 153, 153));
-        jTxtFieldTitolo.setText("Inserisci titolo");
 
         jTxtFieldAutore.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jTxtFieldAutore.setForeground(new java.awt.Color(153, 153, 153));
-        jTxtFieldAutore.setText("Inserisci autore");
         jTxtFieldAutore.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTxtFieldAutoreActionPerformed(evt);
@@ -134,8 +141,6 @@ public class FrameNewMateriale extends javax.swing.JFrame {
         });
 
         jTxtFieldAnno.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jTxtFieldAnno.setForeground(new java.awt.Color(153, 153, 153));
-        jTxtFieldAnno.setText("Inserisci anno");
         jTxtFieldAnno.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTxtFieldAnnoActionPerformed(evt);
@@ -161,11 +166,6 @@ public class FrameNewMateriale extends javax.swing.JFrame {
         jScrollPane2.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
 
         jListTipo.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jListTipo.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Libro", "Rivista", "Audiovisivo" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
         jScrollPane2.setViewportView(jListTipo);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -239,43 +239,74 @@ public class FrameNewMateriale extends javax.swing.JFrame {
     }//GEN-LAST:event_jTxtFieldAnnoActionPerformed
 
     private void jButtonSalvaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSalvaActionPerformed
-        // TODO add your handling code here:
+        String titolo = jTxtFieldTitolo.getText();
+        String autore = jTxtFieldAutore.getText();
+        String annoStr = jTxtFieldAnno.getText();
+        String genere = jListGenere.getSelectedValue();
+        String tipo = jListTipo.getSelectedValue();
+
+        ArrayList listaDaControllare = new ArrayList<>();
+        listaDaControllare.add(titolo);
+        listaDaControllare.add(autore);
+        listaDaControllare.add(annoStr);
+        listaDaControllare.add(genere);
+        listaDaControllare.add(tipo);
+
+        boolean esito = Controllo.isVuoto(listaDaControllare);
+        int annoTmp = Controllo.isNum(annoStr);
+
+        if (esito && annoTmp != -1) {
+
+            // Salvo il nuovo materiale
+            if (tipo.equals("LIBRO")) {
+                int anno = annoTmp;
+
+                Libro libroToSave = new Libro();
+
+                libroToSave.anno = anno;
+                libroToSave.titolo = titolo;
+                libroToSave.autore = autore;
+                libroToSave.genere = Libro.genereMateriale.valueOf(genere);
+                libroToSave.tipo = MaterialeBiblioteca.tipoMateriale.valueOf(tipo);
+
+                GestioneFile.creaLibro(titolo, libroToSave);
+
+            } else if (tipo.equals("RIVISTA")) {
+                int anno = annoTmp;
+
+                Rivista rivistaToSave = new Rivista();
+                rivistaToSave.anno = anno;
+                rivistaToSave.titolo = titolo;
+                rivistaToSave.autore = autore;
+                rivistaToSave.genere = Rivista.genereMateriale.valueOf(genere);
+                rivistaToSave.tipo = MaterialeBiblioteca.tipoMateriale.valueOf(tipo);
+
+                GestioneFile.creaRivista(titolo, rivistaToSave);
+
+            } else if (tipo.equals("AUDIOVISIVO")) {
+                int anno = annoTmp;
+
+                Rivista rivistaToSave = new Rivista();
+                rivistaToSave.anno = anno;
+                rivistaToSave.titolo = titolo;
+                rivistaToSave.autore = autore;
+                rivistaToSave.genere = Rivista.genereMateriale.valueOf(genere);
+                rivistaToSave.tipo = MaterialeBiblioteca.tipoMateriale.valueOf(tipo);
+
+                GestioneFile.creaRivista(titolo, rivistaToSave);
+
+            } else {
+                // Errore
+            }
+
+            this.setVisible(false);
+            frameInventario.setVisible(true);
+            return;
+        }
+        String testo = "Attenzione, compilare tutti i campi per creare il materiale";
+        PopupFrame.alertPopup(testo);
     }//GEN-LAST:event_jButtonSalvaActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(FrameNewMateriale.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(FrameNewMateriale.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(FrameNewMateriale.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(FrameNewMateriale.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new FrameNewMateriale().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonSalva;
