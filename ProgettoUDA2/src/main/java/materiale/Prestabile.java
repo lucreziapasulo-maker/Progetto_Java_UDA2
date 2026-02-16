@@ -9,7 +9,8 @@ package materiale;
  * @author lucrezia.pasulo
  */
 public interface Prestabile {
+
     void presta();
+
     void restituisci();
-    boolean isDisponibile();    
 }

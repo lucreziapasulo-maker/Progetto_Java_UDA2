@@ -3,6 +3,9 @@ package interfaccia;
 import gestioneFile.GestioneFile;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import materiale.MaterialeBiblioteca;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -24,21 +27,25 @@ public class FrameBiblioteca extends javax.swing.JFrame {
         // Inizializzo le cartelle
         GestioneFile.initApp();
 
-        // Azioni bottoni interfaccia
-        jButtonCerca.addActionListener((ActionEvent e) -> {
-            String titoloDaCercare = jTxtCerca.getText();
-            BCercaTitolo.cercaTitolo(titoloDaCercare);
-        });
+        // Popolo la jList con i tipi di materiale
+        MaterialeBiblioteca.tipoMateriale[] tmp2 = MaterialeBiblioteca.tipoMateriale.values();
+        String[] stringaTmp2 = new String[tmp2.length];
 
-        jButtonInventario.addActionListener((ActionEvent e) -> {
-            this.setVisible(false);
-            new FrameInventario(this).setVisible(true);
-        });
+        for (int i = 0; i < tmp2.length; i++) {
+            stringaTmp2[i] = tmp2[i].toString();
+        }
+        jListTipo.setListData(stringaTmp2);
 
-        jButtonPrestito.addActionListener((ActionEvent e) -> {
-            // TODO: Aggiungere richiamo metodo
+        jListMateriale.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evt) {
+                if (evt.getClickCount() == 2) {
+                    String tipo = jListTipo.getSelectedValue();
+                    String titolo = jListMateriale.getSelectedValue();
+                    GestioneFile.apriFile(tipo, titolo);
+                }
+            }
         });
-
     }
 
     /**
@@ -56,12 +63,18 @@ public class FrameBiblioteca extends javax.swing.JFrame {
         jButtonInventario = new javax.swing.JButton();
         jButtonCerca = new javax.swing.JButton();
         jTxtCerca = new javax.swing.JTextField();
+        jLabelPrestito = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jListMateriale = new javax.swing.JList<>();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jListTipo = new javax.swing.JList<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jLabel1.setFont(new java.awt.Font("Arial Rounded MT Bold", 0, 18)); // NOI18N
         jLabel1.setText("Benvenuto nella biblioteca");
 
+        jButtonPrestito.setBackground(new java.awt.Color(204, 204, 255));
         jButtonPrestito.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jButtonPrestito.setText("Chiedi in presito");
         jButtonPrestito.addActionListener(new java.awt.event.ActionListener() {
@@ -70,6 +83,7 @@ public class FrameBiblioteca extends javax.swing.JFrame {
             }
         });
 
+        jButtonRestituisci.setBackground(new java.awt.Color(204, 204, 255));
         jButtonRestituisci.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jButtonRestituisci.setText("Restituisci");
         jButtonRestituisci.addActionListener(new java.awt.event.ActionListener() {
@@ -78,6 +92,7 @@ public class FrameBiblioteca extends javax.swing.JFrame {
             }
         });
 
+        jButtonInventario.setBackground(new java.awt.Color(210, 245, 246));
         jButtonInventario.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jButtonInventario.setText("Inventario");
         jButtonInventario.addActionListener(new java.awt.event.ActionListener() {
@@ -86,6 +101,7 @@ public class FrameBiblioteca extends javax.swing.JFrame {
             }
         });
 
+        jButtonCerca.setBackground(new java.awt.Color(204, 204, 255));
         jButtonCerca.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jButtonCerca.setText("Cerca libro");
         jButtonCerca.addActionListener(new java.awt.event.ActionListener() {
@@ -95,48 +111,67 @@ public class FrameBiblioteca extends javax.swing.JFrame {
         });
 
         jTxtCerca.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jTxtCerca.setForeground(new java.awt.Color(204, 204, 204));
         jTxtCerca.setText("Inserisci titolo");
+
+        jLabelPrestito.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+
+        jScrollPane1.setViewportView(jListMateriale);
+
+        jScrollPane2.setViewportView(jListTipo);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(135, 135, 135)
-                .addComponent(jLabel1)
-                .addContainerGap(154, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(29, 29, 29)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButtonPrestito, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButtonRestituisci, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jButtonCerca, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jButtonInventario, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jTxtCerca, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(68, 68, 68))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(135, 135, 135)
+                        .addComponent(jLabel1))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(35, 35, 35)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(jButtonCerca, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jButtonInventario, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jTxtCerca, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(2, 2, 2)
+                                .addComponent(jLabelPrestito, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(35, 35, 35)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jButtonPrestito)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButtonRestituisci, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))))
+                .addContainerGap(21, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(23, 23, 23)
                 .addComponent(jLabel1)
-                .addGap(74, 74, 74)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButtonPrestito, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButtonCerca, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButtonRestituisci, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(44, 44, 44)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jTxtCerca, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)
-                        .addGap(18, 18, 18)))
-                .addGap(35, 35, 35)
-                .addComponent(jButtonInventario, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(85, Short.MAX_VALUE))
+                        .addComponent(jButtonCerca, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jTxtCerca, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(9, 9, 9)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
+                        .addComponent(jLabelPrestito, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 257, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButtonInventario, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonRestituisci, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonPrestito, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(30, 30, 30))
         );
 
         pack();
@@ -151,11 +186,25 @@ public class FrameBiblioteca extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonRestituisciActionPerformed
 
     private void jButtonInventarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonInventarioActionPerformed
-        // TODO add your handling code here:
+        this.setVisible(false);
+        new FrameInventario(this).setVisible(true);
     }//GEN-LAST:event_jButtonInventarioActionPerformed
 
     private void jButtonCercaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCercaActionPerformed
-        // TODO add your handling code here:
+        String titoloDaCercare = jTxtCerca.getText();
+        String tipoDaCercare;
+        try {
+            tipoDaCercare = jListTipo.getSelectedValue();
+        } catch (Exception e) {
+            tipoDaCercare = "";
+        }
+
+        if (!titoloDaCercare.equals("Inserisci titolo") && !tipoDaCercare.isEmpty()) {
+            String[] listaMateria = GestioneFile.cercaFile(tipoDaCercare, titoloDaCercare);
+            jListMateriale.setListData(listaMateria);
+        } else {
+            PopupFrame.alertPopup("Attenzione, inserire sia il titolo, sia il tipo di materiale da cercare");
+        }
     }//GEN-LAST:event_jButtonCercaActionPerformed
 
     /**
@@ -199,6 +248,11 @@ public class FrameBiblioteca extends javax.swing.JFrame {
     private javax.swing.JButton jButtonPrestito;
     private javax.swing.JButton jButtonRestituisci;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabelPrestito;
+    private javax.swing.JList<String> jListMateriale;
+    private javax.swing.JList<String> jListTipo;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextField jTxtCerca;
     // End of variables declaration//GEN-END:variables
 }

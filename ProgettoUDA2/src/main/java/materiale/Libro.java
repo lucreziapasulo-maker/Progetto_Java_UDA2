@@ -8,7 +8,7 @@ package materiale;
  *
  * @author lucrezia.pasulo
  */
-public class Libro extends MaterialeBiblioteca {
+public class Libro extends MaterialeBiblioteca implements Prestabile {
 
     public enum genereMateriale {
         THRILLER,
@@ -26,6 +26,7 @@ public class Libro extends MaterialeBiblioteca {
     public genereMateriale genere;
     public int anno;
     public tipoMateriale tipo = tipoMateriale.LIBRO;
+    public boolean isDisponibile;
 
     public Libro() {
 // Costruttore vuoto
@@ -36,6 +37,7 @@ public class Libro extends MaterialeBiblioteca {
         this.genere = genere;
         this.autore = autore;
         this.anno = anno;
+        boolean isDisponibile = true;
     }
 
     public String getTipo(Libro biblioteca) {
@@ -65,21 +67,23 @@ public class Libro extends MaterialeBiblioteca {
         String anno = String.valueOf(this.anno);
         String tipo = this.tipo.toString();
         String genere = this.genere.toString();
+        String stringaTmp;
+        if (isDisponibile) {
+            stringaTmp = "è disponibile";
+        } else {
+            stringaTmp = "non è disponibile";
+        }
+        String isDisponibile = stringaTmp;
 
-        return titolo + "\n" + autore + "\n" + anno + "\n" + tipo + "\n" + genere;
+        return titolo + "\n" + autore + "\n" + anno + "\n" + tipo + "\n" + genere + "\n" + isDisponibile;
     }
 
     public void restituisci() {
-
+        this.isDisponibile = true;
     }
 
     public void presta() {
-
-    }
-
-    public boolean isDisponibile() {
-        // Da modificare
-        return false;
+        this.isDisponibile = false;
     }
 
 }

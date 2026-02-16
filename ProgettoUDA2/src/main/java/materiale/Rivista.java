@@ -8,7 +8,7 @@ package materiale;
  *
  * @author lu242
  */
-public class Rivista extends MaterialeBiblioteca {
+public class Rivista extends MaterialeBiblioteca implements Prestabile {
 
     public enum genereMateriale {
         GOSSIP,
@@ -25,6 +25,7 @@ public class Rivista extends MaterialeBiblioteca {
     public String autore;
     public genereMateriale genere;
     public int anno;
+    public boolean isDisponibile;
 
     public Rivista() {
 // Costruttore vuoto
@@ -35,6 +36,7 @@ public class Rivista extends MaterialeBiblioteca {
         this.genere = genere;
         this.autore = autore;
         this.anno = anno;
+        boolean isDisponibile = true;
     }
 
 //    @Override
@@ -54,21 +56,23 @@ public class Rivista extends MaterialeBiblioteca {
         String anno = String.valueOf(this.anno);
         String tipo = this.tipo.toString();
         String genere = this.genere.toString();
+        String stringaTmp;
+        if (isDisponibile) {
+            stringaTmp = "è disponibile";
+        } else {
+            stringaTmp = "non è disponibile";
+        }
+        String isDisponibile = stringaTmp;
 
-        return titolo + "\n" + autore + "\n" + anno + "\n" + tipo + "\n" + genere;
+        return titolo + "\n" + autore + "\n" + anno + "\n" + tipo + "\n" + genere + "\n" + isDisponibile;
     }
 
     public void restituisci() {
-
+        this.isDisponibile = true;
     }
 
     public void presta() {
-
-    }
-
-    public boolean isDisponibile() {
-        // Da modificare
-        return false;
+        this.isDisponibile = false;
     }
 
 }

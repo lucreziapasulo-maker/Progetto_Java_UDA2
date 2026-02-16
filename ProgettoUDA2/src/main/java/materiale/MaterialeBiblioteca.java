@@ -25,6 +25,7 @@ public abstract class MaterialeBiblioteca<T> {
     public tipoMateriale tipo;
     public genereMateriale genere;
     int anno;
+    public boolean isDisponibile;
 
     public String getTipo(MaterialeBiblioteca biblioteca) {
         return biblioteca.tipo.toString();

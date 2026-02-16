@@ -268,6 +268,7 @@ public class FrameNewMateriale extends javax.swing.JFrame {
                 libroToSave.autore = autore;
                 libroToSave.genere = Libro.genereMateriale.valueOf(genere);
                 libroToSave.tipo = MaterialeBiblioteca.tipoMateriale.valueOf(tipo);
+                libroToSave.isDisponibile = true;
 
                 GestioneFile.creaLibro(titolo, libroToSave);
 
@@ -280,6 +281,7 @@ public class FrameNewMateriale extends javax.swing.JFrame {
                 rivistaToSave.autore = autore;
                 rivistaToSave.genere = Rivista.genereMateriale.valueOf(genere);
                 rivistaToSave.tipo = MaterialeBiblioteca.tipoMateriale.valueOf(tipo);
+                rivistaToSave.isDisponibile = true;
 
                 GestioneFile.creaRivista(titolo, rivistaToSave);
 

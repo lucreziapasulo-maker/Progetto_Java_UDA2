@@ -5,14 +5,18 @@
 package gestioneFile;
 
 import interfaccia.PopupFrame;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import materiale.AudioVisivo;
 import materiale.Libro;
 import materiale.MaterialeBiblioteca;
 import materiale.Rivista;
+import interfaccia.FrameLettura;
+import javax.swing.JTextArea;
 
 /**
  *
@@ -50,53 +54,7 @@ public class GestioneFile {
             } else {
                 // Non faccio nulla
             }
-        }
-    }
 
-    //------
-    // TODO: non funziona!! Quando richiamo materiale.[cose] 
-    public static void creaLibroTEST(String titolo, Libro materiale) {
-        String fileName = titolo + ESTENSIONE;
-        File fileTOwrite = new File(FOLDER_LIBRI, fileName);
-
-        System.out.println("Creazione file: " + fileTOwrite.getName());
-
-        String testo;
-
-//      Creazione file
-        if (!fileTOwrite.exists()) {
-            try {
-                fileTOwrite.createNewFile();
-                // Scrivo il file
-                PrintWriter writer = new PrintWriter(fileTOwrite);
-
-                // Scrivo il contenuto nel file
-                writer.write(materiale.contenutoTOwrite());
-
-                // Pulisco il writer e lo chiudo
-                writer.flush();
-                writer.close();
-
-            } catch (Exception e) {
-                testo = "Errore nella creazione del file " + fileTOwrite.getName();
-                System.out.println(testo);
-                PopupFrame.alertPopup(testo);
-            }
-        } else {
-            // Chiedo se sovrascrivere il file
-            testo = "Esiste già un file di questo libro, si intende sovrascriverlo?";
-            int ok = PopupFrame.confirmPopup(testo);
-
-            if (ok == 1) {
-                try {
-                    fileTOwrite.createNewFile();
-                } catch (Exception e) {
-                    testo = "Errore nella creazione del file " + fileTOwrite.getName();
-                    System.out.println(testo);
-                }
-            } else {
-                // Non faccio nulla
-            }
         }
     }
 
@@ -181,13 +139,90 @@ public class GestioneFile {
             // Pulisco il writer e lo chiudo
             writer.flush();
             writer.close();
-
             return true;
 
         } catch (Exception e) {
-
         }
         return false;
+    }
+
+    public static String[] cercaFile(String tipo, String titolo) {
+        String folderString = FOLDER_MAIN + "\\" + tipo;
+        String fileDaAprire = folderString + "\\" + titolo + ESTENSIONE;
+        System.out.println("fileDaAprire = " + fileDaAprire);
+
+        // ArrayList che conterrà i file trovati
+        ArrayList<String> listaMateriale = new ArrayList<String>();
+
+        String strTmp;
+
+        // Carico la lista di tutti i file
+        File folder = new File(folderString);
+        File[] listFiles = folder.listFiles();
+
+        //System.out.println("\nstrToFind = " + strToFind);// Tengo in considerazione sono i file che mi interessano        
+        for (int i = 0; i <= listFiles.length - 1; i++) {
+            strTmp = listFiles[i].getName();
+
+            strTmp = strTmp.toLowerCase();
+            titolo = titolo.toLowerCase();
+
+            if (strTmp.contains(titolo)) {
+                listaMateriale.add(strTmp);
+            }
+        }
+
+        // Converto la ArrayList in String[], altrimenti non riesco visualizzarla sul frame
+        String[] strTmp2 = new String[listaMateriale.size()];
+        for (int i = 0; i < strTmp2.length; i++) {
+            strTmp2[i] = listaMateriale.get(i);
+        }
+
+        return strTmp2;
+    }
+
+    public static void apriFile(String tipo, String titolo) {
+        String fileDaAprire = FOLDER_MAIN + "\\" + tipo + "\\" + titolo;
+
+        // set della current recipe        
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(fileDaAprire));
+            mostraSuFrame(reader);
+
+        } catch (Exception e) {
+            System.out.println("Errore nell'apertura del file");
+        }
+    }
+
+    private static void mostraSuFrame(BufferedReader reader) {
+        // Creo il frame
+        FrameLettura frameLettura = new FrameLettura();
+
+        // Aggiungo l'area di lettura
+        JTextArea areaLettura = frameLettura.getAreaTesto();
+
+        // Estrapolo il testo della ricetta
+        try {
+            System.out.println("Leggo dal file");
+
+            String line = reader.readLine();
+            // Uso StringBuilder al posto di una lista o ArrayList per non visualizzare caratteri separatori
+            StringBuilder testo = new StringBuilder();
+
+            testo.append(line).append("\n");
+
+            while ((line = reader.readLine()) != null) {
+                testo.append(line).append("\n");
+                //System.out.println("testo = " + testo);
+            }
+
+            //System.out.println("testo = " + testo);
+            // Scrivo sull'area
+            areaLettura.setText(testo.toString());
+
+        } catch (Exception e) {
+            System.out.println("Errore nella lettura del file");
+        }
     }
 
 }

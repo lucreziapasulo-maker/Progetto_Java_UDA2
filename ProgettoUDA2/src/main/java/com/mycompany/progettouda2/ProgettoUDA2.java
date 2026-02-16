@@ -7,11 +7,12 @@ import interfaccia.FrameBiblioteca;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import materiale.Libro;
 import materiale.ListaMateriale;
 import materiale.MaterialeBiblioteca;
 import materiale.MaterialeBiblioteca.genereMateriale;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -19,25 +20,17 @@ import materiale.MaterialeBiblioteca.genereMateriale;
  */
 public class ProgettoUDA2 {
 
-    /*
-    Il progetto si propone di gestire una libreria, con utenti e libri
-     */
+    public static final Logger LOG = LogManager.getLogger();
+
     public static void main(String[] args) {
 
-        Libro libro1 = new Libro();
-        libro1.titolo = "LOTR";
-        libro1.anno = 1920;
-//        libro1.genere = genereMateriale.FANTASY;
-
-//        System.out.println(libro1.toString());
-//        List<MaterialeBiblioteca> listaMateriale = new ArrayList<>();
-//        listaMateriale.add(libro1);
-        // For each -> stampa
-        //            System.out.println(n.toString());
         java.awt.EventQueue.invokeLater(() -> {
             new FrameBiblioteca().setVisible(true);
         });
 
+    }
+
+    public ProgettoUDA2() {
     }
 
 }
