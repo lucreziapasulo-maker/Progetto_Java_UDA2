@@ -8,7 +8,7 @@ package materiale;
  *
  * @author lu242
  */
-public class Rivista extends MaterialeBiblioteca implements Prestabile {
+public class Rivista extends MaterialeBiblioteca<Rivista.genereMateriale> {
 
     public enum genereMateriale {
         GOSSIP,
@@ -19,36 +19,14 @@ public class Rivista extends MaterialeBiblioteca implements Prestabile {
         FAI_DA_TE
     }
 
-    public tipoMateriale tipo = MaterialeBiblioteca.tipoMateriale.LIBRO;
-
-    public String titolo;
-    public String autore;
-    public genereMateriale genere;
-    public int anno;
-    public boolean isDisponibile;
-
     public Rivista() {
 // Costruttore vuoto
     }
 
-    public Rivista(String titolo, genereMateriale genere, String autore, int anno) {
-        this.titolo = titolo;
-        this.genere = genere;
-        this.autore = autore;
-        this.anno = anno;
-        boolean isDisponibile = true;
+    public Rivista(String titolo, String autore, tipoMateriale tipo, genereMateriale genere, int anno, boolean isDisponibile) {
+        super(titolo, autore, tipo, genere, anno, isDisponibile);
     }
 
-//    @Override
-//    public String contenutoTOwrite() {
-//        String titolo = this.getTitolo(this);
-//        String autore = this.getAutore(this);
-//        String anno = this.getAnno(this);
-//        String tipo = this.getTipo(this);
-//        String genere = this.getGenere(this);
-//
-//        return titolo + "\n" + autore + "\n" + anno + "\n" + tipo + "\n" + genere;
-//    }
     @Override
     public String contenutoTOwrite() {
         String titolo = this.titolo;
@@ -66,13 +44,4 @@ public class Rivista extends MaterialeBiblioteca implements Prestabile {
 
         return titolo + "\n" + autore + "\n" + anno + "\n" + tipo + "\n" + genere + "\n" + isDisponibile;
     }
-
-    public void restituisci() {
-        this.isDisponibile = true;
-    }
-
-    public void presta() {
-        this.isDisponibile = false;
-    }
-
 }

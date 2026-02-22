@@ -1,0 +1,3 @@
+INFO  | 2026-02-22 14:22:53 | [AWT-EventQueue-0] interfaccia.FrameBiblioteca (FrameBiblioteca.java:34) - Avvio Frame Biblitoeca (principale)
+INFO  | 2026-02-22 14:22:53 | [AWT-EventQueue-0] gestioneFile.GestioneFile (GestioneFile.java:59) - Inizializzazione cartelle
+INFO  | 2026-02-22 14:22:57 | [AWT-EventQueue-0] interfaccia.FrameBiblioteca$1 (FrameBiblioteca.java:58) - Apertura materiale in base alla selezione dell'utente (doppio click)

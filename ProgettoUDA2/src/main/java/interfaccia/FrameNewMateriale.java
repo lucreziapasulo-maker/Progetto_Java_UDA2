@@ -4,17 +4,22 @@
  */
 package interfaccia;
 
+import controlli.Controllo;
+import controlli.InvalidFieldsException;
 import gestioneFile.GestioneFile;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import materiale.AudioVisivo;
 import materiale.Libro;
 import materiale.MaterialeBiblioteca;
 import materiale.MaterialeBiblioteca.tipoMateriale;
+import materiale.MaterialeBibliotecaOperation;
 import materiale.Rivista;
 
 /**
@@ -254,53 +259,49 @@ public class FrameNewMateriale extends javax.swing.JFrame {
 
         boolean esito = Controllo.isVuoto(listaDaControllare);
         int annoTmp = Controllo.isNum(annoStr);
+        // Controllo se l'anno è valido (quindi non nel futuro)
+        try {
+            Controllo.isYearValid(annoTmp, "Anno");
+        } catch (InvalidFieldsException ex) {
+            Logger.getLogger(FrameNewMateriale.class.getName()).log(Level.SEVERE, null, ex);
+            PopupFrame.alertPopup(ex.getMessage());
+            return;
+        }
 
         if (esito && annoTmp != -1) {
 
-            // Salvo il nuovo materiale
-            if (tipo.equals("LIBRO")) {
-                int anno = annoTmp;
+            int anno = annoTmp;
+            MaterialeBiblioteca materialeToSave = null;
 
-                Libro libroToSave = new Libro();
-
-                libroToSave.anno = anno;
-                libroToSave.titolo = titolo;
-                libroToSave.autore = autore;
-                libroToSave.genere = Libro.genereMateriale.valueOf(genere);
-                libroToSave.tipo = MaterialeBiblioteca.tipoMateriale.valueOf(tipo);
-                libroToSave.isDisponibile = true;
-
-                GestioneFile.creaLibro(titolo, libroToSave);
-
-            } else if (tipo.equals("RIVISTA")) {
-                int anno = annoTmp;
-
-                Rivista rivistaToSave = new Rivista();
-                rivistaToSave.anno = anno;
-                rivistaToSave.titolo = titolo;
-                rivistaToSave.autore = autore;
-                rivistaToSave.genere = Rivista.genereMateriale.valueOf(genere);
-                rivistaToSave.tipo = MaterialeBiblioteca.tipoMateriale.valueOf(tipo);
-                rivistaToSave.isDisponibile = true;
-
-                GestioneFile.creaRivista(titolo, rivistaToSave);
-
-            } else if (tipo.equals("AUDIOVISIVO")) {
-                int anno = annoTmp;
-
-                Rivista rivistaToSave = new Rivista();
-                rivistaToSave.anno = anno;
-                rivistaToSave.titolo = titolo;
-                rivistaToSave.autore = autore;
-                rivistaToSave.genere = Rivista.genereMateriale.valueOf(genere);
-                rivistaToSave.tipo = MaterialeBiblioteca.tipoMateriale.valueOf(tipo);
-
-                GestioneFile.creaRivista(titolo, rivistaToSave);
-
-            } else {
-                // Errore
+            switch (tipo) {
+                case "LIBRO":
+                    materialeToSave = new Libro();
+                    materialeToSave.setGenere(Libro.genereMateriale.valueOf(genere));
+                    break;
+                case "RIVISTA":
+                    materialeToSave = new Rivista();
+                    materialeToSave.setGenere(Rivista.genereMateriale.valueOf(genere));
+                    break;
+                case "AUDIOVISIVO":
+                    materialeToSave = new AudioVisivo();
+                    materialeToSave.setGenere(AudioVisivo.genereMateriale.valueOf(genere));
+                    break;           
+                default:
+                    break;
+            }
+            materialeToSave.setIsDisponibile(true);
+            materialeToSave.setAnno(anno);
+            materialeToSave.setTitolo(titolo);
+            materialeToSave.setAutore(autore);
+            materialeToSave.setTipo(MaterialeBiblioteca.tipoMateriale.valueOf(tipo));
+            
+            GestioneFile.creaMateriale(materialeToSave);            
+            
+            if (operation!=null){
+                operation.performOperation(materialeToSave);
             }
 
+            // Salvo il nuovo materiale
             this.setVisible(false);
             frameInventario.setVisible(true);
             return;
@@ -309,6 +310,10 @@ public class FrameNewMateriale extends javax.swing.JFrame {
         PopupFrame.alertPopup(testo);
     }//GEN-LAST:event_jButtonSalvaActionPerformed
 
+    private MaterialeBibliotecaOperation operation;
+    public void onMaterialeAdded(MaterialeBibliotecaOperation operation){
+        this.operation = operation;
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonSalva;

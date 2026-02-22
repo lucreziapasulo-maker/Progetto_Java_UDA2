@@ -8,7 +8,7 @@ package materiale;
  *
  * @author lu242
  */
-public class AudioVisivo extends MaterialeBiblioteca {
+public class AudioVisivo extends MaterialeBiblioteca<AudioVisivo.genereMateriale> {
 
     public enum genereMateriale {
         DOCUMENTARIO,
@@ -17,25 +17,16 @@ public class AudioVisivo extends MaterialeBiblioteca {
         AVVENTURA,
         AZIONE,
         SAGGIO,
-        ROMANTICO
+        ROMANTICO,
+        DRAMMATICO
     }
-
-    public tipoMateriale tipo = MaterialeBiblioteca.tipoMateriale.LIBRO;
-
-    public String titolo;
-    public String autore;
-    public genereMateriale genere;
-    public int anno;
 
     public AudioVisivo() {
 // Costruttore vuoto
     }
 
-    public AudioVisivo(String titolo, genereMateriale genere, String autore, int anno) {
-        this.titolo = titolo;
-        this.genere = genere;
-        this.autore = autore;
-        this.anno = anno;
+    public AudioVisivo(String titolo, String autore, tipoMateriale tipo, genereMateriale genere, int anno, boolean isDisponibile) {
+        super(titolo, autore, tipo, genere, anno, isDisponibile);
     }
 
     @Override
@@ -48,18 +39,4 @@ public class AudioVisivo extends MaterialeBiblioteca {
 
         return titolo + "\n" + autore + "\n" + anno + "\n" + tipo + "\n" + genere;
     }
-
-    public void restituisci() {
-
-    }
-
-    public void presta() {
-
-    }
-
-    public boolean isDisponibile() {
-        // Da modificare
-        return false;
-    }
-
 }

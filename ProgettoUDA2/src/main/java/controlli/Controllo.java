@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package interfaccia;
+package controlli;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
@@ -35,7 +36,6 @@ public class Controllo {
                     // Non faccio nulla
                 }
             }
-
         }
 
         if (sommaEsito == listaDaControllare.size()) {
@@ -54,4 +54,12 @@ public class Controllo {
         }
         return num;
     }
+
+    public static void isYearValid(int num, String field) throws InvalidFieldsException {
+        int anno = LocalDate.now().getYear();
+        if (anno < num) {
+            throw new InvalidFieldsException(field, num);
+        }
+    }
+
 }

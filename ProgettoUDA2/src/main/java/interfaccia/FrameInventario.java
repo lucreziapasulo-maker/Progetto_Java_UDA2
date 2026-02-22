@@ -1,8 +1,12 @@
 package interfaccia;
 
+import gestioneFile.GestioneFile;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.JFrame;
+import materiale.MaterialeBiblioteca;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -17,8 +21,45 @@ public class FrameInventario extends javax.swing.JFrame {
     /**
      * Creates new form FrameInventario
      */
-    public FrameInventario(JFrame frameBiblioteca) {
+    FrameBiblioteca frameBiblioteca;
+
+    public FrameInventario(FrameBiblioteca frameBiblioteca) {
         initComponents();
+
+        this.frameBiblioteca = frameBiblioteca;
+        /*
+        Inizializzo l'interfaccia, prima popolando la lista dei tipi. Dopo la 
+        selezione, la lista del materiale si popola di conseguenza, con il 
+        contenuto dell'intera cartella tipo.
+        
+        Button Aggiungi: apre un altro frame, che permette di inserire il nuovo 
+        materiale
+        
+        Button Elimina: selezionando un elemento nella lista del materiale, 
+        premendo questo pulsante, si elimina il file dalla cartella
+         */
+
+        jListMateriale.setToolTipText("Selezionare prima il tipo di materiale per vedere la lista completa");
+
+        // Popolo la lista dei tipi
+        MaterialeBiblioteca.tipoMateriale[] tmp2 = MaterialeBiblioteca.tipoMateriale.values();
+        String[] stringaTmp2 = new String[tmp2.length];
+
+        for (int i = 0; i < tmp2.length; i++) {
+            stringaTmp2[i] = tmp2[i].toString();
+        }
+        jListTipo.setListData(stringaTmp2);
+
+        // Popolo la lista dei materiali in base al tipo scelto
+        jListTipo.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evt) {
+                if (evt.getClickCount() == 1) {
+                    String tipo = jListTipo.getSelectedValue();
+                    refreshMateriale(tipo);
+                }
+            }
+        });
 
         jButtonHome.addActionListener((ActionEvent e) -> {
             this.setVisible(false);
@@ -26,12 +67,24 @@ public class FrameInventario extends javax.swing.JFrame {
         });
 
         jButtonAggiungi.addActionListener((ActionEvent e) -> {
-           this.setVisible(false);
-           new FrameNewMateriale(this).setVisible(true);
-        });
+            this.setVisible(false);
+            FrameNewMateriale varFrameNewMateriale = new FrameNewMateriale(this);
 
-        jButtonElimina.addActionListener((ActionEvent e) -> {
+            // Aggiungo il libro che creo nel prossimo frame, nella lista del materiale e stampo
+            varFrameNewMateriale.onMaterialeAdded(materiale -> {
+                frameBiblioteca.listaMateriale.add(materiale);
+                GestioneFile.scriviLista(frameBiblioteca.listaMateriale);
+                System.out.println("Lista aggiornata: " + frameBiblioteca.listaMateriale.getLast().contenutoTOwrite());
+            });
+
+            // Mostro il frame per creare il nuovo materiale
+            varFrameNewMateriale.setVisible(true);
+
         });
+        // Refresh della lista per vedere subito l'aggiunta su interfaccia
+
+        String tipo = jListTipo.getSelectedValue();
+        refreshMateriale(tipo);
     }
 
     /**
@@ -45,21 +98,23 @@ public class FrameInventario extends javax.swing.JFrame {
 
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
+        jListMateriale = new javax.swing.JList<>();
         jButtonAggiungi = new javax.swing.JButton();
         jButtonElimina = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         jButtonHome = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jListTipo = new javax.swing.JList<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jLabel1.setFont(new java.awt.Font("Arial Rounded MT Bold", 0, 18)); // NOI18N
         jLabel1.setText("Inventario");
 
-        jScrollPane1.setViewportView(jList1);
+        jScrollPane1.setViewportView(jListMateriale);
 
         jButtonAggiungi.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jButtonAggiungi.setText("Aggiungi libro");
+        jButtonAggiungi.setText("Aggiungi materiale");
         jButtonAggiungi.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonAggiungiActionPerformed(evt);
@@ -67,7 +122,7 @@ public class FrameInventario extends javax.swing.JFrame {
         });
 
         jButtonElimina.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jButtonElimina.setText("Elimina libro");
+        jButtonElimina.setText("Elimina materiale");
         jButtonElimina.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonEliminaActionPerformed(evt);
@@ -83,6 +138,8 @@ public class FrameInventario extends javax.swing.JFrame {
                 jButtonHomeActionPerformed(evt);
             }
         });
+
+        jScrollPane2.setViewportView(jListTipo);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -104,7 +161,8 @@ public class FrameInventario extends javax.swing.JFrame {
                         .addGap(67, 67, 67)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jButtonAggiungi, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jButtonElimina, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(jButtonElimina, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                         .addGap(206, 206, 206))))
         );
         layout.setVerticalGroup(
@@ -121,7 +179,9 @@ public class FrameInventario extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jButtonAggiungi, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButtonElimina, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jButtonElimina, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 377, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(26, Short.MAX_VALUE))
         );
@@ -134,13 +194,46 @@ public class FrameInventario extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonAggiungiActionPerformed
 
     private void jButtonEliminaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEliminaActionPerformed
-        // TODO add your handling code here:
+        String titolo = jListMateriale.getSelectedValue();
+        String tipo = jListTipo.getSelectedValue();
+
+        try {
+            titolo.isEmpty();
+        } catch (Exception e) {
+            PopupFrame.alertPopup("Attenzione, non è stato selezionato nulla da eliminare");
+            return;
+        }
+        boolean esito = GestioneFile.eliminaFile(titolo, tipo);
+        if (!esito) {
+            PopupFrame.alertPopup("Attenzione, errore nell'eliminazione del file");
+        }
+
+        MaterialeBiblioteca materiale = null;
+        for (MaterialeBiblioteca n : frameBiblioteca.listaMateriale) {
+            if (n.getTitolo().equals(titolo)) {
+                materiale = n;
+                break;
+            }
+        }
+        if (materiale != null) {
+            // Elimino dalla lista il materiale appena eliminato
+            frameBiblioteca.listaMateriale.remove(materiale);
+            GestioneFile.scriviLista(frameBiblioteca.listaMateriale);
+        }
+        
+        PopupFrame.alertPopup("File eliminato con successo");
+        // Aggiorno la visualizzazione della lista
+        refreshMateriale(tipo);
     }//GEN-LAST:event_jButtonEliminaActionPerformed
 
     private void jButtonHomeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonHomeActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButtonHomeActionPerformed
 
+    private void refreshMateriale(String tipo) {
+        String[] listaMateriale = GestioneFile.cercaFile(tipo, "", ""); // Mettendo stringa vuota, prende tutto il contenuto della cartella       
+        jListMateriale.setListData(listaMateriale);
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonAggiungi;
@@ -148,7 +241,9 @@ public class FrameInventario extends javax.swing.JFrame {
     private javax.swing.JButton jButtonHome;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JList<String> jList1;
+    private javax.swing.JList<String> jListMateriale;
+    private javax.swing.JList<String> jListTipo;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     // End of variables declaration//GEN-END:variables
 }

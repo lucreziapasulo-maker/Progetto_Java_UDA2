@@ -8,9 +8,9 @@ package materiale;
  *
  * @author lucrezia.pasulo
  */
-public class Libro extends MaterialeBiblioteca implements Prestabile {
+public class Libro extends MaterialeBiblioteca<Libro.genereMateriale>  {
 
-    public enum genereMateriale {
+    public static enum genereMateriale {
         THRILLER,
         FANTASY,
         STORICO,
@@ -20,44 +20,12 @@ public class Libro extends MaterialeBiblioteca implements Prestabile {
         ROMANTICO
     }
 
-//    public tipoMateriale tipo = MaterialeBiblioteca.tipoMateriale.LIBRO;
-    public String titolo;
-    public String autore;
-    public genereMateriale genere;
-    public int anno;
-    public tipoMateriale tipo = tipoMateriale.LIBRO;
-    public boolean isDisponibile;
-
     public Libro() {
 // Costruttore vuoto
     }
 
-    public Libro(String titolo, genereMateriale genere, String autore, int anno) {
-        this.titolo = titolo;
-        this.genere = genere;
-        this.autore = autore;
-        this.anno = anno;
-        boolean isDisponibile = true;
-    }
-
-    public String getTipo(Libro biblioteca) {
-        return biblioteca.tipo.toString();
-    }
-
-    public String getGenere(Libro biblioteca) {
-        return biblioteca.genere.toString();
-    }
-
-    public String getAnno(Libro biblioteca) {
-        return String.valueOf(biblioteca.anno);
-    }
-
-    public String getAutore(Libro biblioteca) {
-        return biblioteca.autore;
-    }
-
-    public String getTitolo(Libro biblioteca) {
-        return biblioteca.titolo;
+    public Libro(String titolo, String autore, tipoMateriale tipo, genereMateriale genere, int anno, boolean isDisponibile) {
+        super(titolo, autore, tipo, genere, anno, isDisponibile);
     }
 
     @Override
@@ -77,13 +45,4 @@ public class Libro extends MaterialeBiblioteca implements Prestabile {
 
         return titolo + "\n" + autore + "\n" + anno + "\n" + tipo + "\n" + genere + "\n" + isDisponibile;
     }
-
-    public void restituisci() {
-        this.isDisponibile = true;
-    }
-
-    public void presta() {
-        this.isDisponibile = false;
-    }
-
 }

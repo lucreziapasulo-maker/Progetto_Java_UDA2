@@ -4,11 +4,13 @@
  */
 package materiale;
 
+import java.io.Serializable;
+
 /**
  *
  * @author lucrezia.pasulo
  */
-public abstract class MaterialeBiblioteca<T> {
+public abstract class MaterialeBiblioteca<T> implements Prestabile, Serializable {
 
     public enum tipoMateriale {
         LIBRO,
@@ -16,37 +18,85 @@ public abstract class MaterialeBiblioteca<T> {
         AUDIOVISIVO
     }
 
-    public enum genereMateriale {
+//    public enum genereMateriale {
+//    }
+    protected String titolo;
+    protected String autore;
+    protected tipoMateriale tipo;
+    protected T genere;
+    protected int anno;
+    protected boolean isDisponibile;
+
+    public MaterialeBiblioteca() {
 
     }
 
-    String titolo;
-    String autore;
-    public tipoMateriale tipo;
-    public genereMateriale genere;
-    int anno;
-    public boolean isDisponibile;
-
-    public String getTipo(MaterialeBiblioteca biblioteca) {
-        return biblioteca.tipo.toString();
+    public MaterialeBiblioteca(String titolo, String autore, tipoMateriale tipo, T genere, int anno, boolean isDisponibile) {
+        this.titolo = titolo;
+        this.autore = autore;
+        this.tipo = tipo;
+        this.genere = genere;
+        this.anno = anno;
+        this.isDisponibile = isDisponibile;
     }
 
-    public String getGenere(MaterialeBiblioteca biblioteca) {
-        return biblioteca.genere.toString();
+    public String getTipo() {
+        return tipo.toString();
     }
 
-    public String getAnno(MaterialeBiblioteca biblioteca) {
-        return String.valueOf(biblioteca.anno);
+    public String getGenere() {
+        return genere.toString();
     }
 
-    public String getAutore(MaterialeBiblioteca biblioteca) {
-        return biblioteca.autore;
+    public String getAnno() {
+        return String.valueOf(anno);
     }
 
-    public String getTitolo(MaterialeBiblioteca biblioteca) {
-        return biblioteca.titolo;
+    public String getAutore() {
+        return autore;
+    }
+
+    public String getTitolo() {
+        return titolo;
+    }
+
+    public boolean isDisponibile() {
+        return isDisponibile;
+    }
+
+    public void setTitolo(String titolo) {
+        this.titolo = titolo;
+    }
+
+    public void setAutore(String autore) {
+        this.autore = autore;
+    }
+
+    public void setTipo(tipoMateriale tipo) {
+        this.tipo = tipo;
+    }
+
+    public void setGenere(T genere) {
+        this.genere = genere;
+    }
+
+    public void setAnno(int anno) {
+        this.anno = anno;
+    }
+
+    public void setIsDisponibile(boolean isDisponibile) {
+        this.isDisponibile = isDisponibile;
     }
 
     public abstract String contenutoTOwrite();
 
+    @Override
+    public void restituisci() {
+        this.isDisponibile = true;
+    }
+
+    @Override
+    public void presta() {
+        this.isDisponibile = false;
+    }
 }

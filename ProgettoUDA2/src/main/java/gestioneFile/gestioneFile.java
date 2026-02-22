@@ -6,7 +6,6 @@ package gestioneFile;
 
 import interfaccia.PopupFrame;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.PrintWriter;
@@ -16,7 +15,13 @@ import materiale.Libro;
 import materiale.MaterialeBiblioteca;
 import materiale.Rivista;
 import interfaccia.FrameLettura;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import javax.swing.JTextArea;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -28,11 +33,16 @@ public class GestioneFile {
     Vengono create tante cartelle quanti sono i tipi di MaterialeBiblioteca 
     (presi da enum tipoMateriale).
      */
-    public static final String FOLDER_MAIN = System.getProperty("user.dir");
+    public static final String FOLDER_MAIN = System.getProperty("user.dir") + "\\Materiale";
     public static final String FOLDER_LIBRI = MaterialeBiblioteca.tipoMateriale.LIBRO.toString();
     public static final String FOLDER_RIVISTE = MaterialeBiblioteca.tipoMateriale.RIVISTA.toString();
     public static final String FOLDER_AUDIOVISIVO = MaterialeBiblioteca.tipoMateriale.AUDIOVISIVO.toString();
+    public static final String FOLDER_PRESTITO = "In prestito";
+    public static final String FOLDER_LISTA = "Lista";
+
     private static final String ESTENSIONE = ".txt";
+
+    public static final Logger LOG_FILE = LogManager.getLogger(GestioneFile.class);
 
     /*
     -- Metodo per prima creazione cartelle di default
@@ -44,40 +54,66 @@ public class GestioneFile {
         listaFolder.add(FOLDER_LIBRI);
         listaFolder.add(FOLDER_RIVISTE);
         listaFolder.add(FOLDER_AUDIOVISIVO);
+        listaFolder.add(FOLDER_LISTA);
+
+        LOG_FILE.info("Inizializzazione cartelle");
 
         for (Object each : listaFolder) {
             String folderAttuale = each.toString();
             File nuovaCartella = new File(FOLDER_MAIN, folderAttuale);
+            File nuovaCartellaPrestito = new File(nuovaCartella, FOLDER_PRESTITO);
 
-            if (nuovaCartella.mkdir()) {
+            if (nuovaCartella.mkdirs()) {
                 System.out.println("Creazione cartella: " + nuovaCartella.toString());
+                LOG_FILE.debug("Creazione cartella: " + nuovaCartella.toString());
             } else {
                 // Non faccio nulla
             }
-
+            if (!each.equals(FOLDER_LISTA)) {
+                if (nuovaCartellaPrestito.mkdirs()) {
+                    System.out.println("Creazione cartella: " + nuovaCartellaPrestito.toString());
+                } else {
+                    // Non faccio nulla
+                }
+            }
         }
     }
 
     /*
     -- 
      */
+    public static void creaMateriale(MaterialeBiblioteca materiale) {
+        if (materiale instanceof Libro) {
+            Libro libri = (Libro) materiale;
+            creaLibro(libri.getTitolo(), libri);
+
+        } else if (materiale instanceof Rivista) {
+            Rivista rivista = (Rivista) materiale;
+            creaRivista(rivista.getTitolo(), rivista);
+
+        } else if (materiale instanceof AudioVisivo) {
+            AudioVisivo audioVisivo = (AudioVisivo) materiale;
+            creaAudioVisivo(audioVisivo.getTitolo(), audioVisivo);
+        }
+    }
+
     public static void creaLibro(String titolo, Libro materiale) {
         String fileName = titolo + ESTENSIONE;
-        File fileTOwrite = new File(FOLDER_LIBRI, fileName);
+        File fileTOwrite = new File(FOLDER_MAIN + "\\" + FOLDER_LIBRI, fileName);
 
         creaFile(fileTOwrite, materiale);
     }
 
     public static void creaRivista(String titolo, Rivista materiale) {
         String fileName = titolo + ESTENSIONE;
-        File fileTOwrite = new File(FOLDER_RIVISTE, fileName);
+        File fileTOwrite = new File(FOLDER_MAIN + "\\" + FOLDER_RIVISTE, fileName);
 
         creaFile(fileTOwrite, materiale);
     }
 
     public static void creaAudioVisivo(String titolo, AudioVisivo materiale) {
         String fileName = titolo + ESTENSIONE;
-        File fileTOwrite = new File(FOLDER_AUDIOVISIVO, fileName);
+        File fileTOwrite = new File(FOLDER_MAIN + "\\" + FOLDER_AUDIOVISIVO, fileName);
 
         creaFile(fileTOwrite, materiale);
     }
@@ -146,43 +182,102 @@ public class GestioneFile {
         return false;
     }
 
-    public static String[] cercaFile(String tipo, String titolo) {
-        String folderString = FOLDER_MAIN + "\\" + tipo;
-        String fileDaAprire = folderString + "\\" + titolo + ESTENSIONE;
-        System.out.println("fileDaAprire = " + fileDaAprire);
+    public static boolean scriviLista(ArrayList<MaterialeBiblioteca> listaMateriale) {
+        boolean esito = false;
+
+        String folder = FOLDER_MAIN + "\\" + FOLDER_LISTA;
+        String fileLista = folder + "\\" + "ListaMateriale" + ESTENSIONE;
+
+        try {
+            FileOutputStream f = new FileOutputStream(fileLista);
+            ObjectOutputStream fOUT = new ObjectOutputStream(f);
+
+            fOUT.writeObject(listaMateriale);
+            esito = true;
+
+        } catch (Exception e) {
+            System.out.println("Errore nello scrivere la lista: " + e.getMessage());
+        }
+
+        return esito;
+    }
+
+    public static ArrayList<MaterialeBiblioteca> leggiLista() {
+        ArrayList<MaterialeBiblioteca> listaMateriale = new ArrayList<MaterialeBiblioteca>();
+
+        String folder = FOLDER_MAIN + "\\" + FOLDER_LISTA;
+        String fileLista = folder + "\\" + "ListaMateriale" + ESTENSIONE;
+
+        try {
+            FileInputStream f = new FileInputStream(fileLista);
+            ObjectInputStream fIN = new ObjectInputStream(f);
+
+            listaMateriale = (ArrayList<MaterialeBiblioteca>) fIN.readObject();
+
+        } catch (Exception e) {
+            System.out.println("Errore nel leggere la lista: " + e.getMessage());
+        }
+
+        return listaMateriale;
+    }
+
+    public static String[] cercaFile(String tipo, String titolo, String prestito) {
+        String folderString;
+        String fileDaAprire;
+
+        if (prestito.equals("SI")) {
+            // Se devo visulizzare i file in prestito
+            folderString = FOLDER_MAIN + "\\" + tipo + "\\" + FOLDER_PRESTITO;
+            fileDaAprire = folderString + "\\" + titolo + ESTENSIONE;
+        } else {
+            // Se devo visualizzare file NON in prestito
+            folderString = FOLDER_MAIN + "\\" + tipo;
+            fileDaAprire = folderString + "\\" + titolo + ESTENSIONE;
+            System.out.println("fileDaAprire = " + fileDaAprire);
+        }
 
         // ArrayList che conterrà i file trovati
         ArrayList<String> listaMateriale = new ArrayList<String>();
 
         String strTmp;
+        String[] strTmp2 = new String[1];
 
         // Carico la lista di tutti i file
         File folder = new File(folderString);
         File[] listFiles = folder.listFiles();
+        try {
+            //System.out.println("\nstrToFind = " + strToFind);// Tengo in considerazione sono i file che mi interessano        
+            for (int i = 0; i <= listFiles.length - 1; i++) {
+                strTmp = listFiles[i].getName();
 
-        //System.out.println("\nstrToFind = " + strToFind);// Tengo in considerazione sono i file che mi interessano        
-        for (int i = 0; i <= listFiles.length - 1; i++) {
-            strTmp = listFiles[i].getName();
+                strTmp = strTmp.toLowerCase();
+                titolo = titolo.toLowerCase();
 
-            strTmp = strTmp.toLowerCase();
-            titolo = titolo.toLowerCase();
-
-            if (strTmp.contains(titolo)) {
-                listaMateriale.add(strTmp);
+                if (strTmp.contains(titolo)) {
+                    listaMateriale.add(listFiles[i].getName());
+                }
             }
-        }
 
-        // Converto la ArrayList in String[], altrimenti non riesco visualizzarla sul frame
-        String[] strTmp2 = new String[listaMateriale.size()];
-        for (int i = 0; i < strTmp2.length; i++) {
-            strTmp2[i] = listaMateriale.get(i);
+            // Converto la ArrayList in String[], altrimenti non riesco visualizzarla sul frame
+            strTmp2 = new String[listaMateriale.size()];
+            for (int i = 0; i < listaMateriale.size(); i++) {
+                String tmp = listaMateriale.get(i);
+                if (!tmp.toLowerCase().equals(FOLDER_PRESTITO.toLowerCase())) {
+                    // Tolgo l'estensione per una visualizzazione più pulita; gestisco l'estensione solo in questa classe
+                    String stringa = tmp.replace(ESTENSIONE, "");
+                    strTmp2[i] = stringa;
+                }
+            }
+
+        } catch (Exception e) {
+            strTmp2[0] = "";
         }
 
         return strTmp2;
     }
 
     public static void apriFile(String tipo, String titolo) {
-        String fileDaAprire = FOLDER_MAIN + "\\" + tipo + "\\" + titolo;
+        String fileDaAprire = FOLDER_MAIN + "\\" + tipo + "\\" + titolo + ESTENSIONE;
 
         // set della current recipe        
         try {
@@ -225,289 +320,47 @@ public class GestioneFile {
         }
     }
 
-}
+    public static boolean eliminaFile(String titolo, String tipo) {
+        boolean esito = false;
+        String folderString = FOLDER_MAIN + "\\" + tipo;
+        String titoloDaEliminare = folderString + "\\" + titolo + ESTENSIONE;
 
-//////
-//////
-//////   // Apro il file
-//////    public static void mostraContenutoFile(String ricDaAprire) {
-//////
-//////        String fileDaAprire = DEF_BASE_FOLDER + "\\" + ricDaAprire;
-//////        //System.out.println("fileDaAprire = " + fileDaAprire);
-//////
-//////        // set della current recipe        
-//////        Recipe.currentRecipeName = ricDaAprire;
-//////
-//////        try {
-//////            BufferedReader reader = new BufferedReader(new FileReader(fileDaAprire));
-//////
-//////            scriviFrameLettura(reader);
-//////
-//////        } catch (Exception e) {
-//////            System.out.println("Errore nell'apertura del file");
-//////        }
-//////    }
-//////
-//////    // Cerco la ricetta che vuole l'utente
-//////    public static String[] cercaFile(String strToFind) {
-//////        // Cartella ricette
-//////        String defBaseFolder = Recipe.DEF_BASE_FOLDER;
-//////        // ArrayList che conterrà le ricette trovate
-//////        ArrayList<String> listaRicette = new ArrayList<String>();
-//////
-//////        String strTmp;
-//////
-//////        // Carico la lista di tutti i file
-//////        File folder = new File(defBaseFolder);
-//////        File[] listFiles = folder.listFiles();
-//////
-//////        //System.out.println("\nstrToFind = " + strToFind);// Tengo in considerazione sono i file che mi interessano        
-//////        for (int i = 0; i <= listFiles.length - 1; i++) {
-//////            strTmp = listFiles[i].getName();
-//////
-//////            strTmp = strTmp.toLowerCase();
-//////            strToFind = strToFind.toLowerCase();
-//////
-//////            if (strTmp.contains(strToFind)) {
-//////                listaRicette.add(strTmp);
-//////            }
-//////        }
-//////
-//////        // Converto la ArrayList in String[], altrimenti non riesco visualizzarla sul frame
-//////        String[] strTmp2 = new String[listaRicette.size()];
-//////        for (int i = 0; i < strTmp2.length; i++) {
-//////            strTmp2[i] = listaRicette.get(i);
-//////        }
-//////
-//////        return strTmp2;
-//////    }
-//////
-//////    // Creo il frame per visualizzare la ricetta richiesta
-//////    public static void scriviFrameLettura(BufferedReader reader) {
-//////
-//////        // Creo il frame
-//////        FrameLettura frameLettura = new FrameLettura();
-//////
-//////        // Aggiungo l'area di lettura
-//////        JTextArea areaLettura = frameLettura.getAreaTesto();
-//////
-//////        // Estrapolo il testo della ricetta
-//////        try {
-//////            System.out.println("Leggo dal file");
-//////
-//////            String line = reader.readLine();
-//////            // Uso StringBuilder al posto di una lista o ArrayList per non visualizzare caratteri separatori
-//////            StringBuilder testo = new StringBuilder();
-//////
-//////            testo.append(line);
-//////
-//////            while ((line = reader.readLine()) != null) {
-//////                testo.append(line).append("\n");
-//////                //System.out.println("testo = " + testo);
-//////            }
-//////
-//////            //System.out.println("testo = " + testo);
-//////            // Scrivo sull'area
-//////            areaLettura.setText(testo.toString());
-//////
-//////        } catch (Exception e) {
-//////            System.out.println("Errore nella lettura del file");
-//////        }
-//////    }
-//////
-//////    // Creo il file con dentro la ricetta
-//////    public static int creaNuovaRicetta(Recipe recipeToWrite) {
-//////
-//////        // Nome del file + percorso
-//////        String fileName = DEF_BASE_FOLDER + "\\" + recipeToWrite.recipe_name + ".txt";
-//////
-//////        int esito; // int perché voglio gestire più casi con la stessa variabile
-//////
-//////        int result = controllaRicettaEsiste(recipeToWrite.recipe_name);
-//////
-//////        // reuslt = 0 -> sovrascivi/scrivi ricetta
-//////        if (result == 0) {
-//////            System.out.println("Sovrascrivo la ricetta");
-//////
-//////            try {
-//////                PrintWriter writer = new PrintWriter(fileName);
-//////
-//////                File fileTOwrite = creaFile(fileName);
-//////
-//////                // Scrivo il file - dati per ricerche complesse (TODO)
-//////                writer.write("Nome ricetta: " + recipeToWrite.recipe_name);
-//////                writer.write("\nTipo ricetta: " + recipeToWrite.recipe_type);
-//////                writer.write("\nIngredienti chiave: " + recipeToWrite.keyIngredients);
-//////
-//////                // Scrivo il file - il corpo della ricetta
-//////                writer.write("\n\n" + recipeToWrite.recipe_body);
-//////
-//////                // Pulisco il writer e lo chiudo
-//////                writer.flush();
-//////                writer.close();
-//////
-//////                esito = 1;
-//////
-//////            } catch (Exception e) {
-//////                esito = 0;
-//////            }
-//////        } else {
-//////            esito = -2;
-//////            System.out.println("Non ho scritto la ricetta");
-//////        }
-//////
-//////        return esito;
-//////    }
-//////
-//////    public static void controllaFolder(String defBaseFolder) {
-//////        // Se non ho la cartella, la creo
-//////
-//////        boolean esito = false;
-//////
-//////        File folder = new File(defBaseFolder);
-//////        String fullPath = folder.getAbsolutePath();
-//////        //System.out.println("fullPath = " + fullPath);
-//////
-//////        if (!folder.exists()) {
-//////            esito = folder.mkdir();
-//////            System.out.println("Esito creazione cartella " + esito);
-//////        }
-//////    }
-//////
-//////    public static int sovrascriviRicetta(String fileName) {
-//////        int esito; // int perché voglio gestire più cafileNamesi con la stessa variabile
-//////
-//////        String testo = FrameLettura.getTesto();
-//////
-//////        String fileNameCompleto = DEF_BASE_FOLDER + "\\" + fileName;
-//////
-//////        try {
-//////            // Creo il writer e il file
-//////            PrintWriter writer = new PrintWriter(fileName);
-//////            File fileTOwrite = creaFile(fileName);
-//////
-//////            // Scrivo il file - il corpo della ricetta
-//////            writer.write(testo);
-//////            System.out.println("Testo = " + testo);
-//////
-//////            // Pulisco il writer e lo chiudo
-//////            writer.flush();
-//////            writer.close();
-//////
-//////            esito = 1;
-//////
-//////        } catch (Exception e) {
-//////            esito = 0;
-//////        }
-//////
-//////        return esito;
-//////    }
-//////
-//////    private static File creaFile(String fileName) {
-//////        File fileTOwrite = new File(fileName);
-//////
-//////        // Creo il file
-//////        System.out.println("fileName = " + fileName);
-//////
-//////        // Se non esiste il file, lo creo
-//////        if (!fileTOwrite.exists()) {
-//////            try {
-//////                fileTOwrite.createNewFile();
-//////            } catch (IOException ex) {
-//////                Logger.getLogger(NewRecipeFrame.class.getName()).log(Level.SEVERE, null, ex);
-//////            }
-//////        }
-//////
-//////        return fileTOwrite;
-//////    }
-//////
-//////    public static int controllaRicettaEsiste(String recipeName) {
-//////
-//////        String[] listaRicette = cercaFile(recipeName);
-//////        int result;
-//////        // Se trovo qualche ricetta
-//////        if (listaRicette.length > 0) {
-//////            String testo = "Attenzione, questa ricetta esiste già, si intende sovrascirvera?";
-//////            result = creaPopup(testo);
-//////        } else {
-//////            result = 0; // se non trovo la ricetta, la creo di default (SI = 0, NO = 1, CANCEL = 2)
-//////        }
-//////        return result;
-//////    }
-//////
-//////    public static StringBuilder leggiFileIndice(String fileIndice) {
-//////
-//////        StringBuilder testo = new StringBuilder();
-//////
-//////        try {
-//////            BufferedReader reader = new BufferedReader(new FileReader(fileIndice));
-//////
-//////            String line = reader.readLine();
-//////            // Uso StringBuilder al posto di una lista o ArrayList per non visualizzare caratteri separatori
-//////
-//////            testo.append(line);
-//////
-//////            while ((line = reader.readLine()) != null) {
-//////                testo.append(line).append("\n");
-//////                System.out.println("testo = " + testo);
-//////            }
-//////            System.out.println("testo.toString() = " + testo.toString());
-//////        } catch (Exception e) {
-//////            System.out.println("Errore nella lettura del file");
-//////
-//////        }
-//////
-//////        return testo;
-//////    }
-//////
-//////    public static int aggiungiRicettaAIndice(Recipe recipeToWrite) {
-//////        int esito;
-//////
-//////        String folder = "Indice";
-//////        String nameFileIndice = "File indice.txt";
-//////
-//////        String fileCompleto = folder + "\\" + nameFileIndice;
-//////
-//////        // Creo la cartella Indice
-//////        controllaFolder(folder);
-//////        File fileTOwrite = new File(fileCompleto);
-//////
-//////        // Se non esiste il file, lo creo
-//////        if (!fileTOwrite.exists()) {
-//////            try {
-//////                fileTOwrite.createNewFile();
-//////            } catch (IOException ex) {
-//////                Logger.getLogger(NewRecipeFrame.class.getName()).log(Level.SEVERE, null, ex);
-//////            }
-//////        }
-//////
-//////        try {
-//////
-//////            StringBuilder testo = leggiFileIndice(fileCompleto);
-//////
-//////            // Creo il writer e il file
-//////            PrintWriter writer = new PrintWriter(fileCompleto);
-//////            System.out.println("fileName = " + fileCompleto);
-//////
-//////            System.out.println("testo.length() = " + testo.length());
-//////
-//////            // 
-//////            if (testo.length() > 4) {
-//////                writer.write(testo.toString());
-//////            }
-//////            writer.write("\nNome ricetta: " + recipeToWrite.recipe_name);
-//////            writer.write(", Tipo ricetta: " + recipeToWrite.recipe_type);
-//////            writer.write(", Ingredienti chiave: " + recipeToWrite.keyIngredients);
-//////
-//////            // Pulisco il writer e lo chiudo
-//////            writer.flush();
-//////            writer.close();
-//////
-//////            esito = 1;
-//////
-//////        } catch (Exception e) {
-//////            System.out.println("Errore nell'apertura del file");
-//////            esito = 0;
-//////        }
-//////        return 1;
-//////    }
+        try {
+            File fileDaEliminare = new File(titoloDaEliminare);
+            fileDaEliminare.delete();
+            esito = true;
+        } catch (Exception e) {
+            // esito = false; 
+        }
+
+        return esito;
+    }
+
+    public static boolean spostaFile(String titolo, String tipo, String statoPrestito) {
+        boolean esito = false;
+        String folderString = FOLDER_MAIN + "\\" + tipo;
+        String titoloDaSpostare;
+        String nuovaPosizioneString;
+
+        if (statoPrestito.equals("Richiesta prestito")) {
+            titoloDaSpostare = folderString + "\\" + titolo + ESTENSIONE;
+            nuovaPosizioneString = folderString + "\\" + FOLDER_PRESTITO + "\\" + titolo + ESTENSIONE;
+        } else if (statoPrestito.equals("Richiesta restituzione")) {
+            titoloDaSpostare = folderString + "\\" + FOLDER_PRESTITO + "\\" + titolo + ESTENSIONE;
+            nuovaPosizioneString = folderString + "\\" + titolo + ESTENSIONE;
+        } else {
+            nuovaPosizioneString = "";
+            titoloDaSpostare = "";
+        }
+        File fileDaSpostare = new File(titoloDaSpostare);
+
+        if (nuovaPosizioneString.isEmpty()) {
+            return esito;
+        } else {
+            File nuovaPosizione = new File(nuovaPosizioneString);
+            fileDaSpostare.renameTo(nuovaPosizione);
+            esito = true;
+        }
+        return esito;
+    }
+}
