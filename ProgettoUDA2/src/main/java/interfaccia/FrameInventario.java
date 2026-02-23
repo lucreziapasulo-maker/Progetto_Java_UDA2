@@ -206,6 +206,7 @@ public class FrameInventario extends javax.swing.JFrame {
         boolean esito = GestioneFile.eliminaFile(titolo, tipo);
         if (!esito) {
             PopupFrame.alertPopup("Attenzione, errore nell'eliminazione del file");
+            return;
         }
 
         MaterialeBiblioteca materiale = null;
@@ -220,7 +221,7 @@ public class FrameInventario extends javax.swing.JFrame {
             frameBiblioteca.listaMateriale.remove(materiale);
             GestioneFile.scriviLista(frameBiblioteca.listaMateriale);
         }
-        
+
         PopupFrame.alertPopup("File eliminato con successo");
         // Aggiorno la visualizzazione della lista
         refreshMateriale(tipo);

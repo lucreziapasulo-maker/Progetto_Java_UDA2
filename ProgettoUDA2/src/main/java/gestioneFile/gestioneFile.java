@@ -279,7 +279,6 @@ public class GestioneFile {
     public static void apriFile(String tipo, String titolo) {
         String fileDaAprire = FOLDER_MAIN + "\\" + tipo + "\\" + titolo + ESTENSIONE;
 
-        // set della current recipe        
         try {
             BufferedReader reader = new BufferedReader(new FileReader(fileDaAprire));
             mostraSuFrame(reader);
@@ -330,7 +329,7 @@ public class GestioneFile {
             fileDaEliminare.delete();
             esito = true;
         } catch (Exception e) {
-            // esito = false; 
+            LOG_FILE.debug("Eliminazione file fallita.\n" + e.getMessage());
         }
 
         return esito;
