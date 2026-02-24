@@ -18,8 +18,6 @@ public abstract class MaterialeBiblioteca<T> implements Prestabile, Serializable
         AUDIOVISIVO
     }
 
-//    public enum genereMateriale {
-//    }
     protected String titolo;
     protected String autore;
     protected tipoMateriale tipo;
@@ -28,7 +26,7 @@ public abstract class MaterialeBiblioteca<T> implements Prestabile, Serializable
     protected boolean isDisponibile;
 
     public MaterialeBiblioteca() {
-
+// Costruttore vuoto
     }
 
     public MaterialeBiblioteca(String titolo, String autore, tipoMateriale tipo, T genere, int anno, boolean isDisponibile) {
@@ -40,6 +38,7 @@ public abstract class MaterialeBiblioteca<T> implements Prestabile, Serializable
         this.isDisponibile = isDisponibile;
     }
 
+    // Getter
     public String getTipo() {
         return tipo.toString();
     }
@@ -64,6 +63,7 @@ public abstract class MaterialeBiblioteca<T> implements Prestabile, Serializable
         return isDisponibile;
     }
 
+    // Setter
     public void setTitolo(String titolo) {
         this.titolo = titolo;
     }
@@ -88,8 +88,10 @@ public abstract class MaterialeBiblioteca<T> implements Prestabile, Serializable
         this.isDisponibile = isDisponibile;
     }
 
+    // Metodi
     public abstract String contenutoTOwrite();
 
+    // Metodi dell'interfaccia Prestabile
     @Override
     public void restituisci() {
         this.isDisponibile = true;
