@@ -11,6 +11,8 @@ import java.awt.event.MouseEvent;
 import javax.swing.JFrame;
 import materiale.MaterialeBiblioteca;
 import materiale.MaterialeBibliotecaOperation;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -21,6 +23,8 @@ public class FrameRestituzione extends javax.swing.JFrame {
     /**
      * Creates new form FrameRestituzione
      */
+    public static final Logger LOG_FRAMERESTITUZIONE = LogManager.getLogger(FrameRestituzione.class);
+
     public FrameRestituzione(JFrame frameBiblioteca) {
         initComponents();
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -48,11 +52,13 @@ public class FrameRestituzione extends javax.swing.JFrame {
         jButtonConferma.addActionListener((ActionEvent e) -> {
             String titoloDaRestituire = jListMateriale.getSelectedValue();
             if (titoloDaRestituire == null) {
+                LOG_FRAMERESTITUZIONE.debug("Nessuna restituzione avvenuta: non è stato selezionato il titolo");
                 PopupFrame.alertPopup("Attenzione, selezionare un titolo da restituire. Richiesta di restituzione fallita");
                 return;
             }
             String tipo = jListTipo.getSelectedValue();
 
+            // Serve per spostare il file (uso la stessa funzione anche per il prestito
             String statoPrestito = "Richiesta restituzione";
 
             boolean esito = GestioneFile.spostaFile(titoloDaRestituire, tipo, statoPrestito);

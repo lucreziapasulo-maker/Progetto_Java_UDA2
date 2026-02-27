@@ -79,9 +79,6 @@ public class GestioneFile {
         }
     }
 
-    /*
-    -- 
-     */
     public static void creaMateriale(MaterialeBiblioteca materiale) {
         if (materiale instanceof Libro) {
             Libro libri = (Libro) materiale;
@@ -98,8 +95,11 @@ public class GestioneFile {
     }
 
     public static void creaLibro(String titolo, Libro materiale) {
+
         String fileName = titolo + ESTENSIONE;
         File fileTOwrite = new File(FOLDER_MAIN + "\\" + FOLDER_LIBRI, fileName);
+
+        LOG_FILE.debug("Creazione libro come: " + fileTOwrite);
 
         creaFile(fileTOwrite, materiale);
     }
@@ -108,12 +108,16 @@ public class GestioneFile {
         String fileName = titolo + ESTENSIONE;
         File fileTOwrite = new File(FOLDER_MAIN + "\\" + FOLDER_RIVISTE, fileName);
 
+        LOG_FILE.debug("Creazione rivista come: " + fileTOwrite);
+
         creaFile(fileTOwrite, materiale);
     }
 
     public static void creaAudioVisivo(String titolo, AudioVisivo materiale) {
         String fileName = titolo + ESTENSIONE;
         File fileTOwrite = new File(FOLDER_MAIN + "\\" + FOLDER_AUDIOVISIVO, fileName);
+
+        LOG_FILE.debug("Creazione audiovisivo come: " + fileTOwrite);
 
         creaFile(fileTOwrite, materiale);
     }
@@ -127,37 +131,52 @@ public class GestioneFile {
 
         String testo;
 
-//      Creazione file
+//      Creazione file: controllo se il file esiste già
         if (!fileTOwrite.exists()) {
+            // Se il file non esiste già, procedo con la creazione
             try {
+                LOG_FILE.info("Tentativo di creazione file: " + fileTOwrite);
+
                 fileTOwrite.createNewFile();
+                LOG_FILE.debug("Creazione file avvenuta senza errori");
+
                 // Scrivo il file
                 materiale.contenutoTOwrite();
                 boolean esito = scriviFile(fileTOwrite, materiale);
                 if (esito) {
+                    LOG_FILE.debug("Scrittura file avvenuta con successo. Mostro poup");
                     PopupFrame.alertPopup("File " + fileTOwrite.getName() + " creato correttamente");
+
                 } else {
+                    LOG_FILE.debug("Scrittura file fallita. Mostro poup");
                     PopupFrame.alertPopup("Problemi nella scrittura del file " + fileTOwrite.getName());
                 }
             } catch (Exception e) {
+                LOG_FILE.debug("Errore generico creazione/scrittura file.\nMessaggio di errore: " + e.getMessage());
                 testo = "Errore nella creazione del file " + fileTOwrite.getName();
                 System.out.println(testo);
                 PopupFrame.alertPopup(testo);
             }
         } else {
-            // Chiedo se sovrascrivere il file
+            // Se esiste già un file con quel nome, chiedo se sovrascrivere il file
+            LOG_FILE.info("Il file esiste già. Richiedo se sostituirlo (mostro poup)");
+
             testo = "Esiste già un file di questo libro, si intende sovrascriverlo?";
             int ok = PopupFrame.confirmPopup(testo);
 
             if (ok == 1) {
                 try {
+                    // Sovrascrivo
                     fileTOwrite.createNewFile();
+                    LOG_FILE.info("Richiesta sostituzione confermata. Sostituzione file avvenuta con successo");
+
                 } catch (Exception e) {
+                    LOG_FILE.debug("Problemi con la sostituzione del file.\nMessaggio di errore: " + e.getMessage());
                     testo = "Errore nella creazione del file " + fileTOwrite.getName();
                     System.out.println(testo);
                 }
             } else {
-                // Non faccio nulla
+                // Non faccio nulla - basta non salvare il file
             }
         }
     }
@@ -178,6 +197,7 @@ public class GestioneFile {
             return true;
 
         } catch (Exception e) {
+            LOG_FILE.debug("Errore in GestioneFile.scriviFile.\nMessaggio di errore: " + e.getMessage());
         }
         return false;
     }
@@ -194,8 +214,10 @@ public class GestioneFile {
 
             fOUT.writeObject(listaMateriale);
             esito = true;
+            LOG_FILE.info("Scrittura file lista ok. File: " + fileLista);
 
         } catch (Exception e) {
+            LOG_FILE.debug("Errore in GestioneFile.scriviLista.\nMessaggio di errore: " + e.getMessage());
             System.out.println("Errore nello scrivere la lista: " + e.getMessage());
         }
 
@@ -213,14 +235,21 @@ public class GestioneFile {
             ObjectInputStream fIN = new ObjectInputStream(f);
 
             listaMateriale = (ArrayList<MaterialeBiblioteca>) fIN.readObject();
+            LOG_FILE.info("Lettura file lista ok. File: " + fileLista);
 
         } catch (Exception e) {
+            LOG_FILE.debug("Errore in GestioneFile.leggiLista.\nMessaggio di errore: " + e.getMessage());
             System.out.println("Errore nel leggere la lista: " + e.getMessage());
         }
 
         return listaMateriale;
     }
 
+    /* 
+    Cerco tutti i file che corrispondono alla ricerca (in base al tipo del 
+    materiale e se il materiale in questione è in prestito o no).
+    NB: se il titolo è vuoto, trova tutti i file nella cartella
+     */
     public static String[] cercaFile(String tipo, String titolo, String prestito) {
         String folderString;
         String fileDaAprire;
@@ -229,12 +258,14 @@ public class GestioneFile {
             // Se devo visulizzare i file in prestito
             folderString = FOLDER_MAIN + "\\" + tipo + "\\" + FOLDER_PRESTITO;
             fileDaAprire = folderString + "\\" + titolo + ESTENSIONE;
+
         } else {
             // Se devo visualizzare file NON in prestito
             folderString = FOLDER_MAIN + "\\" + tipo;
             fileDaAprire = folderString + "\\" + titolo + ESTENSIONE;
             System.out.println("fileDaAprire = " + fileDaAprire);
         }
+        LOG_FILE.info("File da aprire: " + fileDaAprire);
 
         // ArrayList che conterrà i file trovati
         ArrayList<String> listaMateriale = new ArrayList<String>();
@@ -246,17 +277,19 @@ public class GestioneFile {
         File folder = new File(folderString);
         File[] listFiles = folder.listFiles();
         try {
-            //System.out.println("\nstrToFind = " + strToFind);// Tengo in considerazione sono i file che mi interessano        
             for (int i = 0; i <= listFiles.length - 1; i++) {
                 strTmp = listFiles[i].getName();
 
+                // Converto tutto in lower case per fare un confronto case-insensitive
                 strTmp = strTmp.toLowerCase();
                 titolo = titolo.toLowerCase();
 
                 if (strTmp.contains(titolo)) {
+                    // Aggiungo la corrispondenza alla lista
                     listaMateriale.add(listFiles[i].getName());
                 }
             }
+            LOG_FILE.debug("Corrispondenze trovate: " + listaMateriale.size() + "\nlistaMateriale = " + listaMateriale);
 
             // Converto la ArrayList in String[], altrimenti non riesco visualizzarla sul frame
             strTmp2 = new String[listaMateriale.size()];
@@ -270,6 +303,7 @@ public class GestioneFile {
             }
 
         } catch (Exception e) {
+            LOG_FILE.debug("Problemi con la ricerca del file.\nMessaggio di errore: " + e.getMessage());
             strTmp2[0] = "";
         }
 
@@ -282,9 +316,12 @@ public class GestioneFile {
         // set della current recipe        
         try {
             BufferedReader reader = new BufferedReader(new FileReader(fileDaAprire));
+            LOG_FILE.info("Aperutra file ok. Mostro il contenuto su frame");
+
             mostraSuFrame(reader);
 
         } catch (Exception e) {
+            LOG_FILE.debug("Problemi con l'apertura del file.\nMessaggio di errore: " + e.getMessage());
             System.out.println("Errore nell'apertura del file");
         }
     }
@@ -308,14 +345,14 @@ public class GestioneFile {
 
             while ((line = reader.readLine()) != null) {
                 testo.append(line).append("\n");
-                //System.out.println("testo = " + testo);
             }
+            LOG_FILE.info("Visualizazzione contenuto file su frame: " + testo);
 
-            //System.out.println("testo = " + testo);
             // Scrivo sull'area
             areaLettura.setText(testo.toString());
 
         } catch (Exception e) {
+            LOG_FILE.debug("Problemi con la visualizzazione del file sul frame.\nMessaggio di errore: " + e.getMessage());
             System.out.println("Errore nella lettura del file");
         }
     }
@@ -329,7 +366,10 @@ public class GestioneFile {
             File fileDaEliminare = new File(titoloDaEliminare);
             fileDaEliminare.delete();
             esito = true;
+            LOG_FILE.info("File eliminato con successo: " + titoloDaEliminare);
+
         } catch (Exception e) {
+            LOG_FILE.debug("Problemi con l'eliminazione del file " + titoloDaEliminare + "\nMessaggio di errore: " + e.getMessage());
             // esito = false; 
         }
 
@@ -352,14 +392,20 @@ public class GestioneFile {
             nuovaPosizioneString = "";
             titoloDaSpostare = "";
         }
+        LOG_FILE.info("Spostamento file. \nPartenza: " + titoloDaSpostare + "\nDestinazione: " + nuovaPosizioneString);
+
         File fileDaSpostare = new File(titoloDaSpostare);
 
+        // Se la destinazione è vuota (non gestita), ritorno esito che sarà false
         if (nuovaPosizioneString.isEmpty()) {
+            LOG_FILE.debug("Problemi con spostamento file: non è stato spostato nulla perché la destinazione non è stata specificata");
             return esito;
         } else {
             File nuovaPosizione = new File(nuovaPosizioneString);
             fileDaSpostare.renameTo(nuovaPosizione);
             esito = true;
+            LOG_FILE.info("Spostamento file ok");
+ 
         }
         return esito;
     }

@@ -35,7 +35,6 @@ public class FrameLettura extends JFrame {
         // Metodi per formattare i vari elementi
         formattaAreaTesto();
         formattaPanel();
-
     }
 
     public JTextArea getAreaTesto() {
@@ -61,9 +60,7 @@ public class FrameLettura extends JFrame {
         SwingUtilities.invokeLater(() -> areaLettura.setCaretPosition(0));
     }
 
-//     TODO: bottone per modificare la ricetta e salvarla
     public void formattaPanel() {
-
         // Aggiungo la textArea al contenitore di default
         panelScroll.setVerticalScrollBarPolicy(panelScroll.VERTICAL_SCROLLBAR_ALWAYS);
         panelScroll.setHorizontalScrollBarPolicy(panelScroll.HORIZONTAL_SCROLLBAR_AS_NEEDED);

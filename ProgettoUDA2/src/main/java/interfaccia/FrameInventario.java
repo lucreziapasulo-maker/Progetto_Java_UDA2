@@ -5,6 +5,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import javax.swing.JFrame;
 import materiale.MaterialeBiblioteca;
 
@@ -23,10 +25,16 @@ public class FrameInventario extends javax.swing.JFrame {
      */
     FrameBiblioteca frameBiblioteca;
 
+    /**
+     *
+     */
+    public static final Logger LOG_FRAMEINVENTARIO = LogManager.getLogger(FrameInventario.class);
+
     public FrameInventario(FrameBiblioteca frameBiblioteca) {
         initComponents();
 
         this.frameBiblioteca = frameBiblioteca;
+
         /*
         Inizializzo l'interfaccia, prima popolando la lista dei tipi. Dopo la 
         selezione, la lista del materiale si popola di conseguenza, con il 
@@ -38,6 +46,7 @@ public class FrameInventario extends javax.swing.JFrame {
         Button Elimina: selezionando un elemento nella lista del materiale, 
         premendo questo pulsante, si elimina il file dalla cartella
          */
+        LOG_FRAMEINVENTARIO.info("Avvio Frame Inventario");
 
         jListMateriale.setToolTipText("Selezionare prima il tipo di materiale per vedere la lista completa");
 
@@ -55,6 +64,8 @@ public class FrameInventario extends javax.swing.JFrame {
             @Override
             public void mouseClicked(MouseEvent evt) {
                 if (evt.getClickCount() == 1) {
+                    LOG_FRAMEINVENTARIO.info("Click su lista tipo: popolazione lista materiale");
+
                     String tipo = jListTipo.getSelectedValue();
                     refreshMateriale(tipo);
                 }
@@ -62,11 +73,14 @@ public class FrameInventario extends javax.swing.JFrame {
         });
 
         jButtonHome.addActionListener((ActionEvent e) -> {
+            LOG_FRAMEINVENTARIO.info("Premuto pulsante home");
             this.setVisible(false);
             frameBiblioteca.setVisible(true);
         });
 
         jButtonAggiungi.addActionListener((ActionEvent e) -> {
+            LOG_FRAMEINVENTARIO.info("Premuto pulsante per aggiungere nuovo materiale");
+
             this.setVisible(false);
             FrameNewMateriale varFrameNewMateriale = new FrameNewMateriale(this);
 
@@ -82,7 +96,6 @@ public class FrameInventario extends javax.swing.JFrame {
 
         });
         // Refresh della lista per vedere subito l'aggiunta su interfaccia
-
         String tipo = jListTipo.getSelectedValue();
         refreshMateriale(tipo);
     }
@@ -194,20 +207,26 @@ public class FrameInventario extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonAggiungiActionPerformed
 
     private void jButtonEliminaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEliminaActionPerformed
+        LOG_FRAMEINVENTARIO.info("Premuto pulsante elimina materiale");
+
         String titolo = jListMateriale.getSelectedValue();
         String tipo = jListTipo.getSelectedValue();
 
         try {
             titolo.isEmpty();
         } catch (Exception e) {
+            LOG_FRAMEINVENTARIO.debug("Non è stato selezionato nulla da eliminare. Mostro popup");
+
             PopupFrame.alertPopup("Attenzione, non è stato selezionato nulla da eliminare");
             return;
         }
         boolean esito = GestioneFile.eliminaFile(titolo, tipo);
         if (!esito) {
+            LOG_FRAMEINVENTARIO.debug("Problemi nell'eliminazione del materiale. Mostro popup");
             PopupFrame.alertPopup("Attenzione, errore nell'eliminazione del file");
         }
 
+// Prendo dalla lista il materiale interessato
         MaterialeBiblioteca materiale = null;
         for (MaterialeBiblioteca n : frameBiblioteca.listaMateriale) {
             if (n.getTitolo().equals(titolo)) {
@@ -215,12 +234,14 @@ public class FrameInventario extends javax.swing.JFrame {
                 break;
             }
         }
+// Rimuovo il materiale ottenuto dal for-each dalla lista e aggiorno il file della lista
         if (materiale != null) {
             // Elimino dalla lista il materiale appena eliminato
             frameBiblioteca.listaMateriale.remove(materiale);
             GestioneFile.scriviLista(frameBiblioteca.listaMateriale);
         }
-        
+        LOG_FRAMEINVENTARIO.info("Materiale eliminato con successo sia dalla lista che dalla cartella");
+
         PopupFrame.alertPopup("File eliminato con successo");
         // Aggiorno la visualizzazione della lista
         refreshMateriale(tipo);

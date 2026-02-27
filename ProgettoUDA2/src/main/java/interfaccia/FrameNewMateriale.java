@@ -7,13 +7,11 @@ package interfaccia;
 import controlli.Controllo;
 import controlli.InvalidFieldsException;
 import gestioneFile.GestioneFile;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import javax.swing.JFrame;
 import materiale.AudioVisivo;
 import materiale.Libro;
@@ -33,6 +31,8 @@ public class FrameNewMateriale extends javax.swing.JFrame {
      */
     JFrame frameInventario;
 
+    public static final Logger LOG_FRAMENEWMATERIALE = LogManager.getLogger(FrameNewMateriale.class);
+
     public FrameNewMateriale(JFrame frameInventario) {
         initComponents();
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -48,13 +48,14 @@ public class FrameNewMateriale extends javax.swing.JFrame {
             stringaTmp2[i] = tmp2[i].toString();
         }
         jListTipo.setListData(stringaTmp2);
-        // ------------
-        // Popolo su interfaccia la lista "generi"
 
+        // Popolo su interfaccia la lista "generi"
+        // - Al click del tipo di materiale, viene popolata la lista dei generi
         jListTipo.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent evt) {
                 if (evt.getClickCount() == 1) {
+                    LOG_FRAMENEWMATERIALE.info("Premuto un tipo del materiale, lista generi popolata di conseguenza");
 
                     String tipoMateriale = jListTipo.getSelectedValue();
 
@@ -244,6 +245,8 @@ public class FrameNewMateriale extends javax.swing.JFrame {
     }//GEN-LAST:event_jTxtFieldAnnoActionPerformed
 
     private void jButtonSalvaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSalvaActionPerformed
+        LOG_FRAMENEWMATERIALE.info("Premuto pulsante salva");
+
         String titolo = jTxtFieldTitolo.getText();
         String autore = jTxtFieldAutore.getText();
         String annoStr = jTxtFieldAnno.getText();
@@ -272,7 +275,9 @@ public class FrameNewMateriale extends javax.swing.JFrame {
 
             int anno = annoTmp;
             MaterialeBiblioteca materialeToSave = null;
+            LOG_FRAMENEWMATERIALE.info("I controlli sono andati a buon fine, salvo il materiale");
 
+            // Campi specifici per materiale
             switch (tipo) {
                 case "LIBRO":
                     materialeToSave = new Libro();
@@ -285,19 +290,20 @@ public class FrameNewMateriale extends javax.swing.JFrame {
                 case "AUDIOVISIVO":
                     materialeToSave = new AudioVisivo();
                     materialeToSave.setGenere(AudioVisivo.genereMateriale.valueOf(genere));
-                    break;           
+                    break;
                 default:
                     break;
             }
+            // Campi comuni a tutti i materiali
             materialeToSave.setIsDisponibile(true);
             materialeToSave.setAnno(anno);
             materialeToSave.setTitolo(titolo);
             materialeToSave.setAutore(autore);
             materialeToSave.setTipo(MaterialeBiblioteca.tipoMateriale.valueOf(tipo));
-            
-            GestioneFile.creaMateriale(materialeToSave);            
-            
-            if (operation!=null){
+
+            GestioneFile.creaMateriale(materialeToSave);
+
+            if (operation != null) {
                 operation.performOperation(materialeToSave);
             }
 
@@ -311,7 +317,8 @@ public class FrameNewMateriale extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonSalvaActionPerformed
 
     private MaterialeBibliotecaOperation operation;
-    public void onMaterialeAdded(MaterialeBibliotecaOperation operation){
+
+    public void onMaterialeAdded(MaterialeBibliotecaOperation operation) {
         this.operation = operation;
     }
 
