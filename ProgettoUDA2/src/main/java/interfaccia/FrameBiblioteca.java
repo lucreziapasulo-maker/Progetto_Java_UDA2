@@ -21,6 +21,20 @@ import org.apache.logging.log4j.Logger;
  */
 public class FrameBiblioteca extends javax.swing.JFrame {
 
+    /*
+    Frame principale.
+    Funzionalità:
+    - Pulsante cerca -> cercare dei titoli (selezionando il tipo di materiale e
+    una parte del titolo
+       -> con doppio click sul titolo, viene aperto per essere visualizzato
+    - Pulsante inventario -> apre un altro frame che permette di aggiungere e/o
+    eliminare materiale
+    - Pulsante presta -> sposta il titolo selezionato nella relativa cartella
+    "in prestito" all'interno della cartella del tipo. Viene anche aggiornata la
+    lista completa del materiale, modificando la variabile "isDisponibile"
+    - Pulsante restituisci -> apre un altro frame con la lista del materiale
+    attualmente in prestito
+     */
     ArrayList<MaterialeBiblioteca> listaMateriale = new ArrayList<MaterialeBiblioteca>();
     public static final Logger LOG_FRAMEBIBLIOTECA = LogManager.getLogger(FrameBiblioteca.class);
 
@@ -117,7 +131,7 @@ public class FrameBiblioteca extends javax.swing.JFrame {
 
         jButtonCerca.setBackground(new java.awt.Color(204, 204, 255));
         jButtonCerca.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jButtonCerca.setText("Cerca libro");
+        jButtonCerca.setText("Cerca materiale");
         jButtonCerca.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonCercaActionPerformed(evt);
@@ -192,17 +206,27 @@ public class FrameBiblioteca extends javax.swing.JFrame {
 
     private void jButtonPrestitoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPrestitoActionPerformed
         // Per mettere in prestito il materiale, lo sposto nella cartella "in prestito" all'interno della cartella del materiale
+        LOG_FRAMEBIBLIOTECA.info("Richiesta di prestito in corso");
+
         String titoloInPrestito = jListMateriale.getSelectedValue();
+
+        // Controllo che sia stato selezionato un titolo
         if (titoloInPrestito == null) {
             PopupFrame.alertPopup("Nessun titolo selezionato, richiesta di prestito fallita");
+            LOG_FRAMEBIBLIOTECA.info("Richiesta di prestito fallita. Var titoloInPrestito = " + titoloInPrestito);
+
             return;
         }
+
         String tipo = jListTipo.getSelectedValue();
         String statoPrestito = "Richiesta prestito";
 
+        // Sposto il titolo selezionato nella cartella "in prestito"
         boolean esito = GestioneFile.spostaFile(titoloInPrestito, tipo, statoPrestito);
 
         if (esito) {
+            LOG_FRAMEBIBLIOTECA.info("Spostamento nella cartella prestito andato a buon fine");
+
             // Richiamo il presta per avere salvato lo stato anche nella lista
             MaterialeBiblioteca materialeInPrestito = null;
             for (MaterialeBiblioteca n : listaMateriale) {
@@ -211,26 +235,33 @@ public class FrameBiblioteca extends javax.swing.JFrame {
                     break;
                 }
             }
+            LOG_FRAMEBIBLIOTECA.info("Aggiornamento lista materiale (richiesta di prestito)");
+
             materialeInPrestito.presta();
             GestioneFile.scriviLista(listaMateriale);
 
             PopupFrame.alertPopup("Richiesta di prestito andata a buon file");
         } else {
             PopupFrame.alertPopup("Richiesta di prestito fallita");
+            LOG_FRAMEBIBLIOTECA.error("Richiesta di prestito fallita");
         }
 
         // Refresho la lista di materiale visualizzata
         String titoloDaCercare = jTxtCerca.getText();
+
+        LOG_FRAMEBIBLIOTECA.info("Refresh interfaccia");
         refreshMateriale(tipo, titoloDaCercare);
     }//GEN-LAST:event_jButtonPrestitoActionPerformed
 
     private void jButtonRestituisciActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRestituisciActionPerformed
         // Per restituire il materiale, lo sposto nella cartella originaria
 
+        LOG_FRAMEBIBLIOTECA.info("Richiesta di restituzione in corso");
+
         // Creo il frame per restituire il materiale e faccio in modo che alla sua chiusura, il frame principale torni visibile
         FrameRestituzione frameRest = new FrameRestituzione(this);
 
-        // Aggiungo il libro che creo nel prossimo frame, nella lista del materiale e stampo
+        // Aggiungo il libro che creo nel prossimo frame, nella lista del materiale e stampo la lista aggiornata
         frameRest.onMaterialeReturn(materiale -> {
             materiale.restituisci();
             GestioneFile.scriviLista(listaMateriale);
@@ -238,9 +269,13 @@ public class FrameBiblioteca extends javax.swing.JFrame {
         });
 
         frameRest.setVisible(true);
+
+        // Intercetto la chiusura del frame e refresho la visualizzazione dei titoli
         frameRest.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
+                LOG_FRAMEBIBLIOTECA.info("Intercettazione chiusura frame restituzione");
+
                 setVisible(true);
                 // Refresho la lista di materiale in caso sia stato preso in prestito e selezionato qualcosa e subito dopo restituito
                 String tipo = jListTipo.getSelectedValue();
@@ -255,16 +290,22 @@ public class FrameBiblioteca extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonRestituisciActionPerformed
 
     private void jButtonInventarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonInventarioActionPerformed
+
+        LOG_FRAMEBIBLIOTECA.info("Apertura frame inventario");
+
         FrameInventario frameInv = new FrameInventario(this);
         frameInv.setVisible(true);
+
+        // Intercetto la chiusura del frame e refresho la visualizzazione dei titoli
         frameInv.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
+                LOG_FRAMEBIBLIOTECA.info("Intercettazione chiusura frame inventario");
+
                 setVisible(true);
                 // Refresho la lista di materiale in caso sia stato preso in prestito e selezionato qualcosa e subito dopo restituito
                 String tipo = jListTipo.getSelectedValue();
                 String titoloDaCercare = jTxtCerca.getText();
-                // Refresho la lista di materiale visualizzata
                 refreshMateriale(tipo, titoloDaCercare);
             }
         });
@@ -272,14 +313,24 @@ public class FrameBiblioteca extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonInventarioActionPerformed
 
     private void jButtonCercaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCercaActionPerformed
+        /*
+        NB: faccio il controllo sul tipo per evitare casi di omonimia fra 
+        materiali di tipi diversi e facilitare la ricerca. 
+        Se non si compila il campo del titolo, vengono trovati tutti i file nella
+        cartella del materiale
+         */
+        LOG_FRAMEBIBLIOTECA.info("Premuto pulsante Cerca");
+
         String titoloDaCercare = jTxtCerca.getText();
         String tipoDaCercare;
         tipoDaCercare = jListTipo.getSelectedValue();
 
+        // Se è stato selezionato il tipo 
         if (tipoDaCercare != null) {
             String[] listaMateria = GestioneFile.cercaFile(tipoDaCercare, titoloDaCercare, "");
             jListMateriale.setListData(listaMateria);
         } else {
+            LOG_FRAMEBIBLIOTECA.debug("Non è stato selezionato il tipo; impossibile fare la ricerca. Visualizzazione popup ");
             PopupFrame.alertPopup("Attenzione, inserire sia il titolo, sia il tipo di materiale da cercare");
         }
     }//GEN-LAST:event_jButtonCercaActionPerformed
@@ -319,6 +370,7 @@ public class FrameBiblioteca extends javax.swing.JFrame {
         });
     }
 
+    // Metodo per refresh visualizzazione lista materiale
     private void refreshMateriale(String tipo, String titolo) {
         String[] listaMateriale = GestioneFile.cercaFile(tipo, titolo, ""); // Mettendo stringa vuota, prende tutto il contenuto della cartella       
         jListMateriale.setListData(listaMateriale);
