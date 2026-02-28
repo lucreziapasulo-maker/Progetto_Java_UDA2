@@ -16,7 +16,7 @@ public class Controllo {
 
     public static boolean isVuoto(ArrayList listaDaControllare) {
         /* 
-        -- Metodo isVuoto(ArrayList listaDaControllare) --
+        Metodo isVuoto(ArrayList listaDaControllare) --
         Per controllare se tutti i campi sono compilati, verifico campo per 
         campo (differenziando String da int), se il campo non è vuoto o non è 0, 
         aumento un contatore "sommaEsito". Alla fine, se 
@@ -55,6 +55,9 @@ public class Controllo {
         return num;
     }
 
+    /*
+    Controllo.isYearValid: verifico che l'anno inserito non sia nel futuro rispetto ad adesso
+    */
     public static void isYearValid(int num, String field) throws InvalidFieldsException {
         int anno = LocalDate.now().getYear();
         if (anno < num) {

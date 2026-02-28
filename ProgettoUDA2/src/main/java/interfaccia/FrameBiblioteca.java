@@ -7,6 +7,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+//import java.util.logging.LogManager;
+//import java.util.logging.Logger;
 import materiale.MaterialeBiblioteca;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
